@@ -1,5 +1,6 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
+from Player import Player
 
 calvin_page = 'http://calvinknights.com/sports/msoc/2017-18/teams/calvin?view=profile&r=0&pos=kickers'
 
@@ -18,3 +19,4 @@ for element in table:
         print(element)
         print('---------------------')
         #This is where we will send in the html elements to a Player constructor where the data will be parsed
+        temp_player = Player()
