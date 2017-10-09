@@ -16,7 +16,5 @@ for element in table:
     href = element.find("a")
     #if href contains "players" it is a player stat table, need to parse the data
     if "players" in str(href):
-        print(element)
-        print('---------------------')
         #This is where we will send in the html elements to a Player constructor where the data will be parsed
-        temp_player = Player()
+        temp_player = Player(element)
