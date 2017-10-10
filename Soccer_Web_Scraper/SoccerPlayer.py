@@ -1,6 +1,6 @@
 import abc
 
-class Player(object):
+class SoccerPlayer(object):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, html_data):
@@ -25,7 +25,10 @@ class Player(object):
         number = td_list[0].contents[0]
         #1 - Nothing
         #2 - "Fr.", "So.", "Jr.", or "Sr." (Year)
-        year = year_translation[td_list[2].contents[0]]
+        if (td_list[2].contents[0] in year_translation):
+            year = year_translation[td_list[2].contents[0]]
+        else:
+            year = td_list[2].contents[0]
         #3 - Position
         #4 - Games Played
         games_played = td_list[4].contents[0]
