@@ -1,7 +1,4 @@
-import abc
-
 class SoccerPlayer(object):
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, html_data):
         year_translation = {}
@@ -66,7 +63,6 @@ class SoccerPlayer(object):
         print("Red Cards:", red_cards)
         print('------End Player Data------\n\n')
 
-    @abc.abstractmethod
     def sendToDatabase(self):
         raise NotImplementedError("Base Player class cannot send to database")
 
