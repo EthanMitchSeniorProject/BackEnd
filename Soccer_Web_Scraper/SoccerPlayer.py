@@ -53,7 +53,17 @@ class SoccerPlayer(object):
         #15 - Pks in form of (<made>-<attempted>)
         #16 - Game Winning Goals
         
-        print("Data parsed:", name + ",", year + ",", number)
+        print("Name:", name)
+        print("Year:", year)
+        print("Games Played:", games_played)
+        print("Games Started:", games_started)
+        print("Goals:", goals)
+        print("Asissts:", assists)
+        print("Points:", points)
+        print("Shots:", shots)
+        print("Shots On Goal:", shots_on_goal)
+        print("Yellow Cards:", yellow_cards)
+        print("Red Cards:", red_cards)
         print('------End Player Data------\n\n')
 
     @abc.abstractmethod
