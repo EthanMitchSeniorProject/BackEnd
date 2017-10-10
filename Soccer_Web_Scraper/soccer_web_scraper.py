@@ -1,7 +1,10 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
+from SoccerPlayer import SoccerPlayer
 
 calvin_page = 'http://calvinknights.com/sports/msoc/2017-18/teams/calvin?view=profile&r=0&pos=kickers'
+hope_page = 'http://athletics.hope.edu/sports/msoc/2017-18/teams/hope?view=profile&r=0&pos=kickers'
+kalamazoo_page = 'http://hornets.kzoo.edu/sports/msoc/2017-18/teams/kalamazoo?view=profile&r=0&pos=kickers'
 
 html_page = urllib2.urlopen(calvin_page)
 soup = BeautifulSoup(html_page, "html.parser")
@@ -16,5 +19,5 @@ for element in table:
     #if href contains "players" it is a player stat table, need to parse the data
     if "players" in str(href):
         print(element)
-        print('---------------------')
         #This is where we will send in the html elements to a Player constructor where the data will be parsed
+        temp_player = SoccerPlayer(element)
