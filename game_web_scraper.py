@@ -1,7 +1,7 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
-from Game.Event import Event
-from Game.Game import Game
+from Soccer.Game.Event import Event
+from Soccer.Game.Game import Game
 
 calvin_game_page = 'http://calvinknights.com/sports/msoc/2017-18/boxscores/20170901_d3xv.xml'
 
