@@ -1,7 +1,7 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
-from Soccer_Web_Scraper.SoccerPlayer import SoccerPlayer
-from Volleyball_Web_Scraper.VolleyballPlayer import VolleyballPlayer
+from Soccer.SoccerPlayer import SoccerPlayer
+from Volleyball.VolleyballPlayer import VolleyballPlayer
 
 calvin_page = 'http://calvinknights.com/sports/msoc/2017-18/teams/calvin?view=profile&r=0&pos=kickers'
 hope_page = 'http://athletics.hope.edu/sports/msoc/2017-18/teams/hope?view=profile&r=0&pos=kickers'
@@ -11,7 +11,7 @@ calvin_vball_page = 'http://calvinknights.com/sports/wvball/2017-18/teams/calvin
 hope_vball_page = 'http://athletics.hope.edu/sports/wvball/2017-18/teams/hope?view=profile&r=0&pos='
 kalamazoo_vball_page = 'http://hornets.kzoo.edu/sports/wvball/2017-18/teams/kalamazoo?view=profile&r=0&pos='
 
-website_list = (calvin_vball_page, hope_vball_page, kalamazoo_vball_page)
+website_list = (calvin_vball_page, hope_vball_page, kalamazoo_vball_page, calvin_page, hope_page, kalamazoo_page)
 
 for site in website_list:
     html_page = urllib2.urlopen(site)
