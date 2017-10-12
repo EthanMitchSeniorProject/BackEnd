@@ -9,7 +9,7 @@ class SoccerPlayer(object):
         year_translation["Sr."] = "Senior"
 
         #parse through to find data
-        print("----Start Player Data")
+        print("----Start Player Data----")
         #Name
         name = html_data.find("a").contents[0]
         if name.startswith(" "):
@@ -64,7 +64,7 @@ class SoccerPlayer(object):
         print('------End Player Data------\n\n')
 
     def sendToDatabase(self):
-        raise NotImplementedError("Base Player class cannot send to database")
+        raise NotImplementedError("Base Soccer Player class cannot send to database")
 
     def getFullName(self):
         return self.first_name + self.last_name
