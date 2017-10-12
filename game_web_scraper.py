@@ -11,7 +11,6 @@ schedule_soup = BeautifulSoup(html_schedule_page, "html.parser")
 game_links = schedule_soup.find_all("a", href=re.compile("boxscores"))
 for game_link in game_links:
     calvin_game_page = 'http://calvinknights.com' + game_link['href']
-    print(calvin_game_page + "\n\n")
     html_page = urllib2.urlopen(calvin_game_page)
     soup = BeautifulSoup(html_page, "html.parser")
     stats_box = soup.find( "div", { "class" : "stats-box half scoring-summary clearfix"})
