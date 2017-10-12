@@ -3,6 +3,7 @@ class Game(object):
     def __init__(self, html_data):
 
         print("----Start Game Data----")
+        self.events = []
 
         teams = html_data.contents[0]
 
@@ -28,6 +29,9 @@ class Game(object):
         print("Date: ", date)
 
         print("----End Game Data----\n\n")
+
+    def addEvent(self, new_event):
+        self.events.append(new_event)
 
     def sendToDatabase(self):
         raise NotImplementedError("Base Game class cannot send to database")
