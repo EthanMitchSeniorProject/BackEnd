@@ -1,8 +1,8 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
 import re
-from Soccer.Game.Event import Event
-from Soccer.Game.Game import Game
+from Soccer.Game.event import Event
+from Soccer.Game.game import Game
 
 #schedule page
 calvin_schedule_page = 'http://calvinknights.com/sports/msoc/2017-18/schedule'

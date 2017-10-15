@@ -1,7 +1,7 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
-from Soccer.SoccerPlayer import SoccerPlayer
-from Volleyball.VolleyballPlayer import VolleyballPlayer
+from Soccer.soccerplayer import SoccerPlayer
+from Volleyball.volleyballplayer import VolleyballPlayer
 
 calvin_page = 'http://calvinknights.com/sports/msoc/2017-18/teams/calvin?view=profile&r=0&pos=kickers'
 hope_page = 'http://athletics.hope.edu/sports/msoc/2017-18/teams/hope?view=profile&r=0&pos=kickers'
