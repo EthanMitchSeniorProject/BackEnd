@@ -4,6 +4,14 @@ import re
 from Soccer.Game.event import Event
 from Soccer.Game.game import Game
 
+#This method takes in a beautiful soup element
+#and checks to see if the time stamp is at half-time.
+#If so, this will contain the starting lineup information
+#Verified with Calvin, Kzoo, Hope, Tufts, etc. 
+def checkForHalfTime(log_element):
+    time = log.find("td", { "class" : "time" })
+    return ((time is not None) and (len(time.contents) > 0) and ("45:00" in time.contents[0]))
+
 #schedule page
 calvin_schedule_page = 'http://calvinknights.com/sports/msoc/2017-18/schedule'
 html_schedule_page = urllib2.urlopen(calvin_schedule_page)
@@ -22,5 +30,12 @@ for game_link in game_links:
     game_info = game_header.find("h1")
     current_game = Game(game_info)
     for element in data:
-        #print(element)
+        print(element)
         current_game.addEvent(Event(element))
+
+    #testing game log parsing
+    logs = soup.findAll("tr", { "class" : "row" })
+    for log in logs:
+        if not checkForHalfTime(log):
+            continue
+        print(log)
