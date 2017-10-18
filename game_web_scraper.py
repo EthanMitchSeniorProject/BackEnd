@@ -4,6 +4,8 @@ import re
 from Soccer.Game.event import Event
 from Soccer.Game.game import Game
 
+#Need to create a "already collected" class so that we don't re-collect the same data
+
 #This method takes in a beautiful soup element
 #and checks to see if the time stamp is at half-time.
 #If so, this will contain the starting lineup information
@@ -21,6 +23,8 @@ for game_link in game_links:
     calvin_game_page = 'http://calvinknights.com' + game_link['href']
     html_page = urllib2.urlopen(calvin_game_page)
     soup = BeautifulSoup(html_page, "html.parser")
+
+    #This collects the scoring summaries
     stats_box = soup.find( "div", { "class" : "stats-box half scoring-summary clearfix"})
     if stats_box is None:
         break
@@ -33,9 +37,26 @@ for game_link in game_links:
         print(element)
         current_game.addEvent(Event(element))
 
-    #testing game log parsing
+    #This collects the starting lineup strings
     logs = soup.findAll("tr", { "class" : "row" })
     for log in logs:
         if not checkForHalfTime(log):
             continue
-        print(log)
+        #print(log)
+
+    #This collects the game stats (goals and assists)
+    game_stat_summary = soup.find("div", { "class" : "stats-box half lineup h clearfix"})
+    player_list = game_stat_summary.findAll("tr")
+    for player in player_list:
+        player_name = player.find("a", { "class" : "player-name"})
+        player_stats = player.findAll("td")
+        if (len(player_stats) == 0) or (player_name is None):
+            continue
+        #0 - Shots
+        #1 - Shots on Goal
+        #2 - Goals
+        #3 - Assists
+        print(player_name.contents[0])
+        print(player_stats[2].contents[0])
+        print(player_stats[3].contents[0])
+
