@@ -14,6 +14,27 @@ def checkForHalfTime(log_element):
     time = log.find("td", { "class" : "time" })
     return ((time is not None) and (len(time.contents) > 0) and ("45:00" in time.contents[0]))
 
+#This is a method because the same code is used for both home and away teams
+#The table_class_string param specifies which table, home or visiting, to look for
+def collectPlayerGameData(soup, table_class_string):
+    game_stat_summary = soup.find("div", { "class" : table_class_string})
+    player_list = game_stat_summary.findAll("tr")
+    for player in player_list:
+        player_name = player.find("a", { "class" : "player-name"})
+        if (player_name is None):
+            player_name = player.find("span", { "class" : "player-name"})
+        player_stats = player.findAll("td")
+        if (len(player_stats) == 0) or (player_name is None) or ("TEAM" in player_name):
+            continue
+        #0 - Shots
+        #1 - Shots on Goal
+        #2 - Goals
+        #3 - Assists
+        print(player_name.contents[0])
+        print(player_stats[2].contents[0])
+        print(player_stats[3].contents[0])
+
+
 #schedule page
 calvin_schedule_page = 'http://calvinknights.com/sports/msoc/2017-18/schedule'
 html_schedule_page = urllib2.urlopen(calvin_schedule_page)
@@ -34,7 +55,6 @@ for game_link in game_links:
     game_info = game_header.find("h1")
     current_game = Game(game_info)
     for element in data:
-        print(element)
         current_game.addEvent(Event(element))
 
     #This collects the starting lineup strings
@@ -45,18 +65,5 @@ for game_link in game_links:
         #print(log)
 
     #This collects the game stats (goals and assists)
-    game_stat_summary = soup.find("div", { "class" : "stats-box half lineup h clearfix"})
-    player_list = game_stat_summary.findAll("tr")
-    for player in player_list:
-        player_name = player.find("a", { "class" : "player-name"})
-        player_stats = player.findAll("td")
-        if (len(player_stats) == 0) or (player_name is None):
-            continue
-        #0 - Shots
-        #1 - Shots on Goal
-        #2 - Goals
-        #3 - Assists
-        print(player_name.contents[0])
-        print(player_stats[2].contents[0])
-        print(player_stats[3].contents[0])
-
+    collectPlayerGameData(soup, "stats-box half lineup h clearfix")
+    collectPlayerGameData(soup, "stats-box half lineup v clearfix")
