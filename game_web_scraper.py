@@ -62,7 +62,7 @@ for game_link in game_links:
     for log in logs:
         if not checkForHalfTime(log):
             continue
-        #print(log)
+        print(log)
 
     #This collects the game stats (goals and assists)
     collectPlayerGameData(soup, "stats-box half lineup h clearfix")
