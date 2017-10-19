@@ -4,8 +4,6 @@ import re
 from Soccer.Game.event import Event
 from Soccer.Game.game import Game
 
-#Need to create a "already collected" class so that we don't re-collect the same data
-
 #This method takes in a beautiful soup element
 #and checks to see if the time stamp is at half-time.
 #If so, this will contain the starting lineup information
@@ -40,6 +38,12 @@ calvin_schedule_page = 'http://calvinknights.com/sports/msoc/2017-18/schedule'
 html_schedule_page = urllib2.urlopen(calvin_schedule_page)
 schedule_soup = BeautifulSoup(html_schedule_page, "html.parser")
 game_links = schedule_soup.find_all("a", href=re.compile("boxscores"))
+
+#list to keep track of games already collected
+#formatted "<home_team>-<away_team>"
+games_collected = []
+
+
 for game_link in game_links:
     calvin_game_page = 'http://calvinknights.com' + game_link['href']
     html_page = urllib2.urlopen(calvin_game_page)
@@ -54,6 +58,12 @@ for game_link in game_links:
     game_header = soup.find( "div", { "class" : "head"})
     game_info = game_header.find("h1")
     current_game = Game(game_info)
+    
+    if current_game.getGameString() in games_collected:
+        continue
+    
+    games_collected.append(current_game.getGameString())
+
     for element in data:
         current_game.addEvent(Event(element))
 
