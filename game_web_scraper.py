@@ -14,7 +14,9 @@ def checkForHalfTime(log_element):
 
 #This is a method because the same code is used for both home and away teams
 #The table_class_string param specifies which table, home or visiting, to look for
-def collectPlayerGameData(soup, table_class_string):
+def collectPlayerGameData(soup, table_class_string, team_name):
+    if not team_name in teams_collecting:
+        return
     game_stat_summary = soup.find("div", { "class" : table_class_string})
     player_list = game_stat_summary.findAll("tr")
     for player in player_list:
@@ -38,6 +40,7 @@ calvin_base_page = 'http://calvinknights.com'
 kzoo_base_page = 'http://hornets.kzoo.edu'
 hope_base_page = 'http://athletics.hope.edu'
 website_list = [calvin_base_page, kzoo_base_page, hope_base_page]
+teams_collecting = ['Calvin', 'Kalamazoo', 'Hope']
 
 #list to keep track of games already collected
 #formatted "<home_team>-<away_team>"
@@ -80,5 +83,5 @@ for site in website_list:
             print(log)
 
         #This collects the game stats (goals and assists)
-        collectPlayerGameData(soup, "stats-box half lineup h clearfix")
-        collectPlayerGameData(soup, "stats-box half lineup v clearfix")
+        collectPlayerGameData(soup, "stats-box half lineup h clearfix", current_game.getHomeTeam())
+        collectPlayerGameData(soup, "stats-box half lineup v clearfix", current_game.getVisitingTeam())

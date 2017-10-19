@@ -36,5 +36,11 @@ class Game(object):
     def getGameString(self):
         return self.home_team + "-" + self.away_team
 
+    def getHomeTeam(self):
+        return self.home_team
+
+    def getVisitingTeam(self):
+        return self.away_team
+        
     def sendToDatabase(self):
         raise NotImplementedError("Base Game class cannot send to database")
