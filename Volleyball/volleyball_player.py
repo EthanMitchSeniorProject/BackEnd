@@ -21,7 +21,10 @@ class VolleyballPlayer(object):
 
         #Order of TD elements
         #0 - Number
-        number = td_list[0].contents[0]
+        if len(td_list[0]) > 0:
+            number = td_list[0].contents[0]
+        else:
+            number = ''
         #1 - Nothing
         #2 - Year
         if (td_list[2].contents[0] in year_translation):
