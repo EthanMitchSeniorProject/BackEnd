@@ -1,32 +1,35 @@
 import pyodbc
-server = 'calvinscoutingreport.database.windows.net'
-database = 'ScoutingReport'
-username = 'athlete'
-password = 'calvinscoutingreport123!'
-driver = '{ODBC Driver 13 for SQL Server}'
-connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
 
 class SoccerPlayer(object):
 
     def __init__(self, html_data):
+        
+        # Information for connecting to the database server on Microsoft Azure
+        server = 'calvinscoutingreport.database.windows.net'
+        database = 'ScoutingReport'
+        username = 'athlete'
+        password = 'calvinscoutingreport123!'
+        driver = '{ODBC Driver 13 for SQL Server}'
+        self._connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+        
+        # Dictionary for translating player year
         year_translation = {}
-
         year_translation["Fr."] = "Freshman"
         year_translation["So."] = "Sophomore"
         year_translation["Jr."] = "Junior"
         year_translation["Sr."] = "Senior"
 
-        #parse through to find data
+        # Parse through to find data
         print("----Start Player Data----")
-        #Name
+
+        # Name
         self._name = html_data.find("a").contents[0]
         if self._name.startswith(" "):
             self._name = self._name[1:]
-        print(self._name)
         
         td_list = html_data.findAll("td")
 
-        #Order of TD elements
+        # Order of TD elements
         #0 - Number
         self._number = td_list[0].contents[0]
 
@@ -52,9 +55,9 @@ class SoccerPlayer(object):
         else:
             self._games_started = td_list[5].contents[0].rstrip()
 
-        #6 - Goals
+        #6 - Goals (gathered from the game by game stats)
 
-        #7 - Assists
+        #7 - Assists (gathered from the game by game stats)
 
         #8 - Points
         if "-" in td_list[8].contents[0]:
@@ -68,7 +71,7 @@ class SoccerPlayer(object):
         else:
             self._shots = td_list[9].contents[0].rstrip()
 
-        #10 - Shot percentage (don't need, we can calculate that if wanted)
+        #10 - Shot percentage (can calculate that if wanted)
 
         #11 - Shots on goal
         if "-" in td_list[11].contents[0]:
@@ -76,7 +79,7 @@ class SoccerPlayer(object):
         else:
             self._shots_on_goal = td_list[11].contents[0].rstrip()
 
-        #12 - Shots on goal percentage (same as 10)
+        #12 - Shots on goal percentage (can calculate that if wanted)
 
         #13 - Yellow Cards
         if "-" in td_list[13].contents[0]:
@@ -96,6 +99,7 @@ class SoccerPlayer(object):
 
         self._position = 'temp'
         
+        # Output the information gathered from the html input
         print("Name:", self._name)
         print("Year:", self._year)
         print("Games Played:", self._games_played)
@@ -105,38 +109,45 @@ class SoccerPlayer(object):
         print("Shots On Goal:", self._shots_on_goal)
         print("Yellow Cards:", self._yellow_cards)
         print("Red Cards:", self._red_cards)
+
         print('------End Player Data------\n\n')
 
+    # Send the Player class information to the database
     def sendToDatabase(self):
         try:
             if self.doesRecordExist():
-                cursor = connection.cursor()
-                sql_command = "UPDATE player SET year = '"+self._year+"', position = '"+self._position+"', games_played = "+str(self._games_played)+", games_started = "+str(self._games_started)+", points = "+str(self._points)+", shots = "+str(self._shots)+", shots_on_goal = "+str(self._shots_on_goal)+", yellow_cards = "+str(self._yellow_cards)+", red_cards = "+str(self._red_cards)+" WHERE name = '"+self._name+"';"
-                #print(sql_command)
+                cursor = self._connection.cursor()
+                sql_command = "UPDATE player SET year = '"+self._year+"', position = '"+self._position+"', games_played = "+str(self._games_played) \
+                    +", games_started = "+str(self._games_started)+", points = "+str(self._points)+", shots = "+str(self._shots)+", shots_on_goal = " \
+                    +str(self._shots_on_goal)+", yellow_cards = "+str(self._yellow_cards)+", red_cards = "+str(self._red_cards)+" WHERE name = '"+self._name+"';"
                 cursor.execute(sql_command)
-                connection.commit()
+                self._connection.commit()
             else:
-                cursor = connection.cursor()
+                cursor = self._connection.cursor()
                 new_id = self.getMaxId()
-                sql_command = "INSERT INTO player VALUES ("+str(new_id)+", '"+self._name+"', '"+self._year+"', '"+self._position+"', "+str(self._games_played)+", "+str(self._games_started)+", "+str(self._points)+", "+str(self._shots)+", "+str(self._shots_on_goal)+", "+str(self._yellow_cards)+", "+str(self._red_cards)+");"
-                #print(sql_command)
+                sql_command = "INSERT INTO player VALUES ("+str(new_id)+", '"+self._name+"', '"+self._year+"', '"+self._position+"', "+str(self._games_played) \
+                    +", "+str(self._games_started)+", "+str(self._points)+", "+str(self._shots)+", "+str(self._shots_on_goal)+", "+str(self._yellow_cards)+", "+str(self._red_cards)+");"
                 cursor.execute(sql_command)
-                connection.commit()
+                self._connection.commit()
         except:
             raise NotImplementedError("Base Soccer Player class cannot send to database")
 
+    # Get the largest id in the player table from the database
+    # Used to set the new id for a new player
     def getMaxId(self):
         try:
-            cursor = connection.cursor()
+            cursor = self._connection.cursor()
             cursor.execute("SELECT MAX(id) FROM player;")
             row = cursor.fetchone()
             return row[0] + 1
         except:
             raise NotImplementedError("Cannot connect to database to get new id")
 
+    # Check if a record exists in the database
+    # Determines if we need to run an INSERT query or an UPDATE query
     def doesRecordExist(self):
         try:
-            cursor = connection.cursor()
+            cursor = self._connection.cursor()
             sql_command = "SELECT COUNT(*) FROM player WHERE name = '"+self._name+"';"
             cursor.execute(sql_command)
             row = cursor.fetchone()
@@ -147,5 +158,6 @@ class SoccerPlayer(object):
         except:
             raise NotImplementedError("Cannot connect to database to see if record exists")
 
+    # Return the full name of the player
     def getFullName(self):
         return self._name
