@@ -4,6 +4,7 @@ class Game(object):
 
         print("----Start Game Data----")
         self.events = []
+        self.player_game_data = []
 
         teams = html_data.contents[0]
 
@@ -43,4 +44,8 @@ class Game(object):
         return self.away_team
         
     def sendToDatabase(self):
-        raise NotImplementedError("Base Game class cannot send to database")
+        #Check if game already exists in database, if so, skip
+        #If data does not already exist, create new entry
+        #Add Events
+        #Add Player Game Data (if player exists in database)
+        raise Exception("unimplemented")

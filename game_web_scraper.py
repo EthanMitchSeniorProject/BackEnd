@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 from Soccer.Game.event import Event
 from Soccer.Game.game import Game
+from Soccer.Game.player_game import PlayerGame
 
 #This method takes in a beautiful soup element
 #and checks to see if the time stamp is at half-time.
@@ -14,9 +15,11 @@ def checkForHalfTime(log_element):
 
 #This is a method because the same code is used for both home and away teams
 #The table_class_string param specifies which table, home or visiting, to look for
-def collectPlayerGameData(soup, table_class_string, team_name):
+def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_strings):
     if not team_name in teams_collecting:
-        return
+        return []
+
+    player_game_list = []
     game_stat_summary = soup.find("div", { "class" : table_class_string})
     player_list = game_stat_summary.findAll("tr")
     for player in player_list:
@@ -30,9 +33,12 @@ def collectPlayerGameData(soup, table_class_string, team_name):
         #1 - Shots on Goal
         #2 - Goals
         #3 - Assists
+
         print(player_name.contents[0])
         print(player_stats[2].contents[0])
         print(player_stats[3].contents[0])
+        player_game = PlayerGame(player_name.contents[0], game_id, player_stats[2].contents[0], player_stats[3].contents[0]))
+        player_game.sendToDatabase()
 
 
 #schedule page
@@ -72,16 +78,21 @@ for site in website_list:
         
         games_collected.append(current_game.getGameString())
 
+        #Check if the game is already in the database, if so, move on
+        if current_game.isInDatabase() == True:
+            continue
+
         for element in data:
             current_game.addEvent(Event(element))
 
         #This collects the starting lineup strings
+        starter_strings = []
         logs = soup.findAll("tr", { "class" : "row" })
         for log in logs:
             if not checkForHalfTime(log):
                 continue
-            print(log)
+            starter_strings.append(log.find("td", { "class" : "play" }).contents[0])
 
         #This collects the game stats (goals and assists)
-        collectPlayerGameData(soup, "stats-box half lineup h clearfix", current_game.getHomeTeam())
-        collectPlayerGameData(soup, "stats-box half lineup v clearfix", current_game.getVisitingTeam())
+        collectPlayerGameData(soup, "stats-box half lineup h clearfix", current_game.getHomeTeam(), current_game.getDatabaseId(), starter_strings)
+        collectPlayerGameData(soup, "stats-box half lineup v clearfix", current_game.getVisitingTeam(), current_game.getDatabaseId(), starter_strings)
