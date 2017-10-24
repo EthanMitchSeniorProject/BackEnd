@@ -16,8 +16,9 @@ def checkForHalfTime(log_element):
 #This is a method because the same code is used for both home and away teams
 #The table_class_string param specifies which table, home or visiting, to look for
 def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_strings):
-    if not team_name in teams_collecting:
-        return []
+    if not team_name.lower().replace(" ", "") in teams_collecting:
+        print("Not collecting data for: " + team_name + " - " + str(len(team_name)))
+        return
 
     player_game_list = []
     game_stat_summary = soup.find("div", { "class" : table_class_string})
@@ -37,7 +38,7 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
         print(player_name.contents[0])
         print(player_stats[2].contents[0])
         print(player_stats[3].contents[0])
-        player_game = PlayerGame(player_name.contents[0], game_id, player_stats[2].contents[0], player_stats[3].contents[0])
+        player_game = PlayerGame(player_name.contents[0], game_id, player_stats[2].contents[0], player_stats[3].contents[0], starter_strings)
         player_game.sendToDatabase()
 
 
@@ -46,7 +47,7 @@ calvin_base_page = 'http://calvinknights.com'
 kzoo_base_page = 'http://hornets.kzoo.edu'
 hope_base_page = 'http://athletics.hope.edu'
 website_list = [calvin_base_page, kzoo_base_page, hope_base_page]
-teams_collecting = ['Calvin', 'Kalamazoo', 'Hope']
+teams_collecting = ['calvin', 'kalamazoo', 'hope']
 
 #list to keep track of games already collected
 #formatted "<home_team>-<away_team>"
@@ -89,10 +90,11 @@ for site in website_list:
         starter_strings = []
         logs = soup.findAll("tr", { "class" : "row" })
         for log in logs:
-            if not checkForHalfTime(log):
-                continue
-            starter_strings.append(log.find("td", { "class" : "play" }).contents[0])
+            if checkForHalfTime(log):
+                starter_strings.append(log.find("td", { "class" : "play" }).contents[0])
+
+        #send game to DB here
 
         #This collects the game stats (goals and assists)
-        collectPlayerGameData(soup, "stats-box half lineup h clearfix", current_game.getHomeTeam(), current_game.getDatabaseId(), starter_strings)
-        collectPlayerGameData(soup, "stats-box half lineup v clearfix", current_game.getVisitingTeam(), current_game.getDatabaseId(), starter_strings)
+        collectPlayerGameData(soup, "stats-box half lineup h clearfix", current_game.getHomeTeam(), current_game.getNewId(), starter_strings)
+        collectPlayerGameData(soup, "stats-box half lineup v clearfix", current_game.getVisitingTeam(), current_game.getNewId(), starter_strings)

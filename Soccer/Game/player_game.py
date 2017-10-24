@@ -1,3 +1,11 @@
+import pyodbc
+server = 'calvinscoutingreport.database.windows.net'
+database = 'ScoutingReport'
+username = 'athlete'
+password = 'calvinscoutingreport123!'
+driver = '{ODBC Driver 13 for SQL Server}'
+connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+
 class PlayerGame(object):
     #Init:
     #Player Name (Used to find player.ID)
@@ -10,13 +18,13 @@ class PlayerGame(object):
         self.name = name
         self.game_id = game_id
         self.goals = goals
-        self.assists
+        self.assists = assists
         self.started = False
         for start_str in starter_strings:
             if (self.name in start_str):
                 self.started = True
 
-    def __findPlayerId():
+    def __findPlayerId(self):
         cursor = connection.cursor()
         sql_command = "SELECT id FROM player where name = '" + self.name + "';"
         cursor.execute(sql_command)
@@ -28,7 +36,14 @@ class PlayerGame(object):
         start_bit = 0
         if self.started:
             start_bit = 1
-        sql_command = "INSERT INTO player_game VALUES (" + self.__findPlayerId() + ", " + self.game_id + ", " + self.goals + ", " + self.assists + ", " + start_bit + ");"
+        
+        player_id = self.__findPlayerId()
+
+        if (player_id is None):
+            print("No player exists in player table with name: " + self.name)
+            return
+
+        sql_command = "INSERT INTO player_game VALUES (" + player_id + ", " + self.game_id + ", " + self.goals + ", " + self.assists + ", " + start_bit + ");"
         print("Player game sql command: " + sql_command)
         cursor = connection.cursor()
         cursor.execute(sql_command)

@@ -1,3 +1,11 @@
+import pyodbc
+server = 'calvinscoutingreport.database.windows.net'
+database = 'ScoutingReport'
+username = 'athlete'
+password = 'calvinscoutingreport123!'
+driver = '{ODBC Driver 13 for SQL Server}'
+connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+
 class Game(object):
 
     def __init__(self, html_data):
@@ -46,16 +54,24 @@ class Game(object):
     def isInDatabase(self):
         cursor = connection.cursor()
         sql_command = "SELECT COUNT(*) FROM game where home_team = '" + self.home_team + "' AND away_team = '" + self.away_team + "';"
+        print("is in database SQL command: " + sql_command)
         cursor.execute(sql_command)
+        row = cursor.fetchone()
         count = row[0]
         return (count > 0)
 
-    def getNewID(self):
+    def getNewId(self):
         cursor = connection.cursor()
         cursor.execute("SELECT MAX(id) FROM game;")
         row = cursor.fetchone()
+        if (row[0] is None):
+            return 0
+
         return row[0] + 1
         
     def sendToDatabase(self):
-        sql_command = "INSERT INTO game VALUES (" + str(self.getNewID()) + ", '" + self.home_team + "', '" + self.away_team + "');"
+        sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + self.home_team + "', '" + self.away_team + "');"
         print("Game SQL command: " + sql_command)
+        cursor = connection.cursor()
+        cursor.execute(sql_command)
+        connection.commit()
