@@ -37,7 +37,7 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
         print(player_name.contents[0])
         print(player_stats[2].contents[0])
         print(player_stats[3].contents[0])
-        player_game = PlayerGame(player_name.contents[0], game_id, player_stats[2].contents[0], player_stats[3].contents[0]))
+        player_game = PlayerGame(player_name.contents[0], game_id, player_stats[2].contents[0], player_stats[3].contents[0])
         player_game.sendToDatabase()
 
 
@@ -79,7 +79,7 @@ for site in website_list:
         games_collected.append(current_game.getGameString())
 
         #Check if the game is already in the database, if so, move on
-        if current_game.isInDatabase() == True:
+        if current_game.isInDatabase():
             continue
 
         for element in data:

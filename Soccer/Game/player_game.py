@@ -6,7 +6,7 @@ class PlayerGame(object):
     #Assists
     #Starter strings (array of two strings that contain the names of each team's starter)
 
-    __init__(self, name, game_id, goals, assists, starter_strings):
+    def __init__(self, name, game_id, goals, assists, starter_strings):
         self.name = name
         self.game_id = game_id
         self.goals = goals
@@ -16,5 +16,20 @@ class PlayerGame(object):
             if (self.name in start_str):
                 self.started = True
 
+    def __findPlayerId():
+        cursor = connection.cursor()
+        sql_command = "SELECT id FROM player where name = '" + self.name + "';"
+        cursor.execute(sql_command)
+        row = cursor.fetchone()
+        return row[0]
+
+
     def sendToDatabase(self):
-        raise NotImplementedError("No method support for PlayerGame.sendToDatabase() yet...")
+        start_bit = 0
+        if self.started:
+            start_bit = 1
+        sql_command = "INSERT INTO player_game VALUES (" + self.__findPlayerId() + ", " + self.game_id + ", " + self.goals + ", " + self.assists + ", " + start_bit + ");"
+        print("Player game sql command: " + sql_command)
+        cursor = connection.cursor()
+        cursor.execute(sql_command)
+        connection.commit()

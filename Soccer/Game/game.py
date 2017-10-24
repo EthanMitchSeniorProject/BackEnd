@@ -42,10 +42,20 @@ class Game(object):
 
     def getVisitingTeam(self):
         return self.away_team
+
+    def isInDatabase(self):
+        cursor = connection.cursor()
+        sql_command = "SELECT COUNT(*) FROM game where home_team = '" + self.home_team + "' AND away_team = '" + self.away_team + "';"
+        cursor.execute(sql_command)
+        count = row[0]
+        return (count > 0)
+
+    def getNewID(self):
+        cursor = connection.cursor()
+        cursor.execute("SELECT MAX(id) FROM game;")
+        row = cursor.fetchone()
+        return row[0] + 1
         
     def sendToDatabase(self):
-        #Check if game already exists in database, if so, skip
-        #If data does not already exist, create new entry
-        #Add Events
-        #Add Player Game Data (if player exists in database)
-        raise Exception("unimplemented")
+        sql_command = "INSERT INTO game VALUES (" + str(self.getNewID()) + ", '" + self.home_team + "', '" + self.away_team + "');"
+        print("Game SQL command: " + sql_command)
