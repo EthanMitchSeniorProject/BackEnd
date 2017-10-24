@@ -29,8 +29,9 @@ class PlayerGame(object):
         sql_command = "SELECT id FROM player where name = '" + self.name + "';"
         cursor.execute(sql_command)
         row = cursor.fetchone()
+        if (row is None):
+            return None
         return row[0]
-
 
     def sendToDatabase(self):
         start_bit = 0

@@ -28,7 +28,7 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
         if (player_name is None):
             player_name = player.find("span", { "class" : "player-name"})
         player_stats = player.findAll("td")
-        if (len(player_stats) == 0) or (player_name is None) or ("TEAM" in player_name):
+        if (len(player_stats) == 0) or (player_name is None) or ("team" in player_name.lower()):
             continue
         #0 - Shots
         #1 - Shots on Goal
@@ -84,7 +84,7 @@ for site in website_list:
             continue
 
         for element in data:
-            current_game.addEvent(Event(element))
+            current_game.addEvent(Event(current_game.getNewId(), element))
 
         #This collects the starting lineup strings
         starter_strings = []
@@ -94,6 +94,7 @@ for site in website_list:
                 starter_strings.append(log.find("td", { "class" : "play" }).contents[0])
 
         #send game to DB here
+        current_game.sendToDatabase()
 
         #This collects the game stats (goals and assists)
         collectPlayerGameData(soup, "stats-box half lineup h clearfix", current_game.getHomeTeam(), current_game.getNewId(), starter_strings)

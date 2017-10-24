@@ -12,7 +12,6 @@ class Game(object):
 
         print("----Start Game Data----")
         self.events = []
-        self.player_game_data = []
 
         teams = html_data.contents[0]
 
@@ -30,7 +29,10 @@ class Game(object):
             self.home_team = self.home_team + team_list[x]
             if x > position:
                 self.home_team = self.home_team + " "
-        
+
+        self.home_team = self.home_team.strip()
+        self.away_team = self.away_team.strip()
+
         date = html_data.find("span").contents[0]
 
         print("Home Team: ", self.home_team)
@@ -75,3 +77,6 @@ class Game(object):
         cursor = connection.cursor()
         cursor.execute(sql_command)
         connection.commit()
+
+        for e in self.events:
+            e.sendToDatabase()
