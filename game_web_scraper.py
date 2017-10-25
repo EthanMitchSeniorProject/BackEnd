@@ -46,7 +46,7 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
 calvin_base_page = 'http://calvinknights.com'
 kzoo_base_page = 'http://hornets.kzoo.edu'
 hope_base_page = 'http://athletics.hope.edu'
-website_list = [calvin_base_page, kzoo_base_page, hope_base_page]
+website_list = [kzoo_base_page]
 teams_collecting = ['calvin', 'kalamazoo', 'hope']
 
 #list to keep track of games already collected
@@ -67,7 +67,7 @@ for site in website_list:
         #This collects the scoring summaries
         stats_box = soup.find( "div", { "class" : "stats-box half scoring-summary clearfix"})
         if stats_box is None:
-            break
+            continue
         table = stats_box.find("tbody")
         data = table.find_all("tr")
         game_header = soup.find( "div", { "class" : "head"})
