@@ -1,7 +1,15 @@
-class Game(object):
+import pyodbc
+server = 'calvinscoutingreport.database.windows.net'
+database = 'ScoutingReport'
+username = 'athlete'
+password = 'calvinscoutingreport123!'
+driver = '{ODBC Driver 13 for SQL Server}'
+connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
 
+class Game(object):
     def __init__(self, html_data):
 
+        self._id = -1
         print("----Start Game Data----")
         self.events = []
 
@@ -21,7 +29,10 @@ class Game(object):
             self.home_team = self.home_team + team_list[x]
             if x > position:
                 self.home_team = self.home_team + " "
-        
+
+        self.home_team = self.home_team.strip()
+        self.away_team = self.away_team.strip()
+
         date = html_data.find("span").contents[0]
 
         print("Home Team: ", self.home_team)
@@ -41,6 +52,35 @@ class Game(object):
 
     def getVisitingTeam(self):
         return self.away_team
+
+    def isInDatabase(self):
+        cursor = connection.cursor()
+        sql_command = "SELECT COUNT(*) FROM game where home_team = '" + self.home_team + "' AND away_team = '" + self.away_team + "';"
+        print("is in database SQL command: " + sql_command)
+        cursor.execute(sql_command)
+        row = cursor.fetchone()
+        count = row[0]
+        return (count > 0)
+
+    def getNewId(self):
+        if self._id != -1:
+            return self._id
+
+        cursor = connection.cursor()
+        cursor.execute("SELECT MAX(id) FROM game;")
+        row = cursor.fetchone()
+        if (row[0] is None):
+            self._id = 0
+        else:
+            self._id = row[0] + 1
+        return self._id
         
     def sendToDatabase(self):
-        raise NotImplementedError("Base Game class cannot send to database")
+        sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + self.home_team + "', '" + self.away_team + "');"
+        print("Game SQL command: " + sql_command)
+        cursor = connection.cursor()
+        cursor.execute(sql_command)
+        connection.commit()
+
+        for e in self.events:
+            e.sendToDatabase()
