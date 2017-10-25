@@ -44,7 +44,7 @@ class PlayerGame(object):
             print("No player exists in player table with name: " + self.name)
             return
 
-        sql_command = "INSERT INTO player_game VALUES (" + player_id + ", " + self.game_id + ", " + self.goals + ", " + self.assists + ", " + start_bit + ");"
+        sql_command = "INSERT INTO player_game VALUES (" + str(player_id) + ", " + str(self.game_id) + ", " + str(self.goals) + ", " + str(self.assists) + ", " + str(start_bit) + ");"
         print("Player game sql command: " + sql_command)
         cursor = connection.cursor()
         cursor.execute(sql_command)

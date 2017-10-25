@@ -28,7 +28,7 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
         if (player_name is None):
             player_name = player.find("span", { "class" : "player-name"})
         player_stats = player.findAll("td")
-        if (len(player_stats) == 0) or (player_name is None) or ("team" in player_name.lower()):
+        if (len(player_stats) == 0) or (player_name is None) or ("team" in str(player_name).lower()):
             continue
         #0 - Shots
         #1 - Shots on Goal

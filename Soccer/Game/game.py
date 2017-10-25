@@ -7,9 +7,9 @@ driver = '{ODBC Driver 13 for SQL Server}'
 connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
 
 class Game(object):
-
     def __init__(self, html_data):
 
+        self._id = -1
         print("----Start Game Data----")
         self.events = []
 
@@ -63,13 +63,17 @@ class Game(object):
         return (count > 0)
 
     def getNewId(self):
+        if self._id != -1:
+            return self._id
+
         cursor = connection.cursor()
         cursor.execute("SELECT MAX(id) FROM game;")
         row = cursor.fetchone()
         if (row[0] is None):
-            return 0
-
-        return row[0] + 1
+            self._id = 0
+        else:
+            self._id = row[0] + 1
+        return self._id
         
     def sendToDatabase(self):
         sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + self.home_team + "', '" + self.away_team + "');"

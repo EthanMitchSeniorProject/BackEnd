@@ -22,7 +22,7 @@ class Event(object):
         self.time = td_list[0].contents[0].replace(" ", "")
         
         #1 - Text of Event
-        self.text = td_list[1].contents[0]
+        self.text = td_list[1].contents[0].replace("'", "''")
 
         #2 - Total Score
         self.total = td_list[2].contents[0]
