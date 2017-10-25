@@ -15,8 +15,12 @@ class SoccerPlayer(object):
         # Dictionary for translating player year
         year_translation = {}
         year_translation["Fr."] = "Freshman"
+        year_translation["Fr"] = "Freshman"
         year_translation["So."] = "Sophomore"
+        year_translation["So"] = "Sophomore"
         year_translation["Jr."] = "Junior"
+        year_translation["Jr"] = "Junior"
+        year_translation["Sr"] = "Senior"
         year_translation["Sr."] = "Senior"
 
         # Parse through to find data
@@ -26,6 +30,8 @@ class SoccerPlayer(object):
         self._name = html_data.find("a").contents[0]
         if self._name.startswith(" "):
             self._name = self._name[1:]
+            self._name = self._name.replace("  ", " ")
+            self._name = self._name.replace("'", "''")
         
         td_list = html_data.findAll("td")
 
@@ -42,6 +48,10 @@ class SoccerPlayer(object):
             self._year = td_list[2].contents[0]
 
         #3 - Position
+        if (len(td_list[3].contents) == 0):
+            self._position = "Unknown"
+        else:
+            self._position = td_list[3].contents[0]
 
         #4 - Games Played
         if "-" in td_list[4].contents[0]:
@@ -96,12 +106,11 @@ class SoccerPlayer(object):
         #15 - Pks in form of (<made>-<attempted>)
 
         #16 - Game Winning Goals
-
-        self._position = 'temp'
         
         # Output the information gathered from the html input
         print("Name:", self._name)
         print("Year:", self._year)
+        print("Position:", self._position)
         print("Games Played:", self._games_played)
         print("Games Started:", self._games_started)
         print("Points:", self._points)
