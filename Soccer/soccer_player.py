@@ -2,7 +2,7 @@ import pyodbc
 
 class SoccerPlayer(object):
 
-    def __init__(self, html_data):
+    def __init__(self, html_data, team_name):
         
         # Information for connecting to the database server on Microsoft Azure
         server = 'calvinscoutingreport.database.windows.net'
@@ -25,6 +25,7 @@ class SoccerPlayer(object):
 
         # Parse through to find data
         print("----Start Player Data----")
+        self.team_name = team_name
 
         # Name
         self._name = html_data.find("a").contents[0]
@@ -121,6 +122,31 @@ class SoccerPlayer(object):
 
         print('------End Player Data------\n\n')
 
+    def getTeamId(self):
+        cursor = self._connection.cursor()
+        select_id_command = "SELECT id FROM team where school_name = '" + self.team_name + "';"
+        cursor.execute(select_id_command)
+        row = cursor.fetchone()
+        if (row is None) or (row[0] is None):
+            select_max_command = "SELECT MAX(id) FROM team;"
+
+            cursor.execute(select_max_command)
+            new_id = 0
+            row = cursor.fetchone()
+            if (row[0] is not None):
+                new_id = row[0] + 1
+
+            #Team does not currently exist, need to create it on DB
+            insert_command = "INSERT INTO team VALUES (" + str(new_id) + ", '" + self.team_name + "');"
+            print(insert_command)
+            cursor.execute(insert_command)
+            print("completed insert")
+            self._connection.commit()
+            return new_id
+        else:
+            #Team exists in DB, return id
+            return row[0]
+
     # Send the Player class information to the database
     def sendToDatabase(self):
         try:
@@ -134,7 +160,7 @@ class SoccerPlayer(object):
             else:
                 cursor = self._connection.cursor()
                 new_id = self.getMaxId()
-                sql_command = "INSERT INTO player VALUES ("+str(new_id)+", '"+self._name+"', '"+self._year+"', '"+self._position+"', "+str(self._games_played) \
+                sql_command = "INSERT INTO player VALUES ("+str(new_id)+", '"+str(self.getTeamId())+"', '"+self._name+"', '"+self._year+"', '"+self._position+"', "+str(self._games_played) \
                     +", "+str(self._games_started)+", "+str(self._points)+", "+str(self._shots)+", "+str(self._shots_on_goal)+", "+str(self._yellow_cards)+", "+str(self._red_cards)+");"
                 cursor.execute(sql_command)
                 self._connection.commit()
@@ -148,6 +174,8 @@ class SoccerPlayer(object):
             cursor = self._connection.cursor()
             cursor.execute("SELECT MAX(id) FROM player;")
             row = cursor.fetchone()
+            if row[0] is None:
+                return 0
             return row[0] + 1
         except:
             raise NotImplementedError("Cannot connect to database to get new id")

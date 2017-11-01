@@ -1,7 +1,9 @@
+import pyodbc
+
 class VolleyballPlayer(object):
 
-    def __init__(self, html_data):
-                # Information for connecting to the database server on Microsoft Azure
+    def __init__(self, html_data, team_name):
+        # Information for connecting to the database server on Microsoft Azure
         server = 'calvinscoutingreport.database.windows.net'
         database = 'ScoutingReport'
         username = 'athlete'
@@ -14,12 +16,13 @@ class VolleyballPlayer(object):
         year_translation["So."] = "Sophomore"
         year_translation["Jr."] = "Junior"
         year_translation["Sr."] = "Senior"
+        self.team_name = team_name
 
         #parse through to find data
         print("----Start Player Data----")
 
         #Name
-        self.name = html_data.find("a").contents[0].strip().replace("  ", " ")
+        self.name = html_data.find("a").contents[0].strip().replace("  ", " ").replace("'", "''")
 
         print(self.name)
 
@@ -38,7 +41,10 @@ class VolleyballPlayer(object):
         else:
             self.year = td_list[2].contents[0]
         #3 - Position
-
+        if (len(td_list[3].contents) > 0):
+            self.position = td_list[3].contents[0]
+        else:
+            self.position = "None"
         #4 - Matches Played
         self.matches_played = td_list[4].contents[0]
         #5 - Sets Played
@@ -72,7 +78,9 @@ class VolleyballPlayer(object):
         #22 - Points per Set
 
         print("Name:", self.name)
+        print("Team:", team_name)
         print("Number:", self.number)
+        print("Position:", self.position)
         print("Year:", self.year)
         print("Matches Played:", self.matches_played)
         print("Sets Played:", self.sets_played)
@@ -88,6 +96,31 @@ class VolleyballPlayer(object):
         print("Points:", self.points)
 
         print('------End Player Data------\n\n')
+        
+    def getTeamId(self):
+        cursor = self._connection.cursor()
+        select_id_command = "SELECT id FROM vball_team WHERE school_name = '" + self.team_name + "';"
+        cursor.execute(select_id_command)
+        row = cursor.fetchone()
+        if (row is None) or (row[0] is None):
+            select_max_command = "SELECT MAX(id) FROM vball_team;"
+
+            cursor.execute(select_max_command)
+            new_id = 0
+            row = cursor.fetchone()
+            if (row[0] is not None):
+                new_id = row[0] + 1
+
+            #Team does not currently exist, need to create it on DB
+            insert_command = "INSERT INTO vball_team VALUES (" + str(new_id) + ", '" + self.team_name + "');"
+            print(insert_command)
+            cursor.execute(insert_command)
+            print("completed")
+            self._connection.commit()
+            return new_id
+        else:
+            #Team exists in DB, return id
+            return row[0]
 
     def getMaxId(self):
         cursor = self._connection.cursor()
@@ -101,6 +134,9 @@ class VolleyballPlayer(object):
     def doesRecordExist(self):
         cursor = self._connection.cursor()
         sql_command = "SELECT COUNT(*) FROM vball_player WHERE name = '" + self.name + "';"
+        print(sql_command)
+        cursor.execute(sql_command)
+        print("completed")
         row = cursor.fetchone()
         count = row[0]
 
@@ -109,18 +145,20 @@ class VolleyballPlayer(object):
     def sendToDatabase(self):
         cursor = self._connection.cursor()
         if self.doesRecordExist():
-            sql_command = "UPDATE vball_player SET year = '" + self.year + "', position = '" + self.position + 
+            sql_command = ("UPDATE vball_player SET year = '" + self.year + "', position = '" + self.position + 
                 "', matches_played = " + self.matches_played + ", sets_played = " + self.sets_played + ", kills = " + 
                 self.kills + ", errors = " + self.errors + ", attempts = " + self.attempts + ", hitting_perc = " + 
-                self.hitting_perc + ", assists = " + self.assists + ", service_aces = " + self.service_aces + ", digs = " + 
+                self.hitting_perc + ", assists = " + self.assists + ", service_aces = " + self.services_aces + ", digs = " + 
                 self.digs + ", solo_blocks = " + self.solo_blocks + ", block_assists = " + self.block_assists + ", points = " + 
-                self.points + " WHERE name = '" + self.name + "';"
+                self.points + " WHERE name = '" + self.name + "';")
         else:
-            sql_command = "INSERT INTO vball_player VALUES (" + str(self.getMaxId + 1) + ", " + TODO: GET TEAM ID + ", '" + 
-                str(self.name) + "', '" + str(self.position) + "', " + str(self.matches_played) + ", " + str(self.sets_played) + ", " + 
-                str(self.kills) + ", " + str(self.errors) + ", " + str(self.attempts) + ", " + str(self.hitting_perc) + ", " + str(self.assists) + ", " + 
-                str(self.service_aces) + ", " + str(self.digs) + ", " + str(self.solo_blocks) + ", " + str(self.block_assists) + ", " + str(self.points) + ");"
+            sql_command = "INSERT INTO vball_player VALUES (" + str(self.getMaxId() + 1) + ", " + str(self.getTeamId()) + ", '" \
+                "" + str(self.name) + "', '" + str(self.year) + "', '"+ str(self.position) + "', " + str(self.matches_played) + ", " + str(self.sets_played) + ", " \
+                "" + str(self.kills) + ", " + str(self.errors) + ", " + str(self.attempts) + ", " + str(self.hitting_perc) + ", " + str(self.assists) + ", " \
+                "" + str(self.services_aces) + ", " + str(self.digs) + ", " + str(self.solo_blocks) + ", " + str(self.block_assists) + ", " + str(self.points) + ");"
             
+        sql_command = sql_command.replace("-", "0")
+        print(sql_command)
         cursor.execute(sql_command)
         self._connection.commit()
 
