@@ -46,7 +46,7 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
 calvin_base_page = 'http://calvinknights.com'
 kzoo_base_page = 'http://hornets.kzoo.edu'
 hope_base_page = 'http://athletics.hope.edu'
-website_list = [kzoo_base_page]
+website_list = [kzoo_base_page, calvin_base_page, hope_base_page]
 teams_collecting = ['calvin', 'kalamazoo', 'hope']
 
 #list to keep track of games already collected
