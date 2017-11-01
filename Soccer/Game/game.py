@@ -55,7 +55,7 @@ class Game(object):
 
     def isInDatabase(self):
         cursor = connection.cursor()
-        sql_command = "SELECT COUNT(*) FROM game where home_team = '" + self.home_team + "' AND away_team = '" + self.away_team + "';"
+        sql_command = "SELECT COUNT(*) FROM game where home_team = '" + str(self.getTeamId(self.home_team)) + "' AND away_team = '" + str(self.getTeamId(self.away_team)) + "';"
         print("is in database SQL command: " + sql_command)
         cursor.execute(sql_command)
         row = cursor.fetchone()
@@ -74,9 +74,34 @@ class Game(object):
         else:
             self._id = row[0] + 1
         return self._id
+
+
+    def getTeamId(self, team):
+        cursor = connection.cursor()
+        cursor.execute("SELECT id FROM team where school_name = '" + team + "'")
+        row = cursor.fetchone()
+        if (row is None) or (row[0] is None):
+            select_max_command = "SELECT MAX(id) FROM team;"
+
+            cursor.execute(select_max_command)
+            new_id = 0
+            row = cursor.fetchone()
+            if (row[0] is not None):
+                new_id = row[0] + 1
+
+            #Team does not currently exist, need to create it on DB
+            insert_command = "INSERT INTO team VALUES (" + str(new_id) + ", '" + team + "');"
+            print(insert_command)
+            cursor.execute(insert_command)
+            print("completed")
+            connection.commit()
+            return new_id
+        else:
+            return row[0]
+
         
     def sendToDatabase(self):
-        sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + self.home_team + "', '" + self.away_team + "');"
+        sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + str(self.getTeamId(self.home_team)) + "', '" + str(self.getTeamId(self.away_team)) + "');"
         print("Game SQL command: " + sql_command)
         cursor = connection.cursor()
         cursor.execute(sql_command)
