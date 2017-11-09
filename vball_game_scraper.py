@@ -73,8 +73,11 @@ for play_stats in play_by_play_list:
             temp_description = td_list[1].contents[0]
 
             # Only create plays for plays that we want to store...
+            # TODO: Rework these two if statements to only be one that checks for "Point"
             if ((temp_description.find("sub") == -1) and (temp_description.find("Timeout") == -1) and (temp_description.find("starters") == -1)):
                 
-                if (not temp_description.isspace() or (temp_description.find("Point") != -1):
-                    current_game.addEvent(Event(current_game.getNewId(), element))
-                    #current_game.sendToDatabase()
+                if (not temp_description.isspace() and (temp_description.find("Point") != -1)):
+                    current_game.addEvent(Event(current_game.getNewId(), current_game.getHomeTeam(), current_game.getAwayTeam(), element))
+    
+    # Send the current game and all its plays to the database
+    current_game.sendToDatabase()
