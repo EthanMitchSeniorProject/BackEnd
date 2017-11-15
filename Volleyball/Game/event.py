@@ -128,7 +128,7 @@ class Event(object):
 
     # Find team_id for a given player based on their name
     def getTeamId(self, player_name):
-        sql_command = "SELECT school_id FROM vball_player WHERE name = '" + player_name + "';"
+        sql_command = "SELECT team_id FROM vball_player WHERE name = '" + player_name + "';"
         cursor = connection.cursor()
         cursor.execute(sql_command)
         row = cursor.fetchone()
