@@ -33,7 +33,7 @@ class VolleyballPlayer(object):
         if len(td_list[0]) > 0:
             self.number = td_list[0].contents[0]
         else:
-            self.number = ''
+            self.number = '-1'
         #1 - Nothing
         #2 - Year
         if (td_list[2].contents[0] in year_translation):
@@ -145,7 +145,7 @@ class VolleyballPlayer(object):
     def sendToDatabase(self):
         cursor = self._connection.cursor()
         if self.doesRecordExist():
-            sql_command = ("UPDATE vball_player SET year = '" + self.year + "', position = '" + self.position + 
+            sql_command = ("UPDATE vball_player SET num = " + self.number + ", year = '" + self.year + "', position = '" + self.position + 
                 "', matches_played = " + self.matches_played + ", sets_played = " + self.sets_played + ", kills = " + 
                 self.kills + ", errors = " + self.errors + ", attempts = " + self.attempts + ", hitting_perc = " + 
                 self.hitting_perc + ", assists = " + self.assists + ", service_aces = " + self.services_aces + ", digs = " + 
@@ -155,7 +155,7 @@ class VolleyballPlayer(object):
             sql_command = "INSERT INTO vball_player VALUES (" + str(self.getMaxId() + 1) + ", " + str(self.getTeamId()) + ", '" \
                 "" + str(self.name) + "', '" + str(self.year) + "', '"+ str(self.position) + "', " + str(self.matches_played) + ", " + str(self.sets_played) + ", " \
                 "" + str(self.kills) + ", " + str(self.errors) + ", " + str(self.attempts) + ", " + str(self.hitting_perc) + ", " + str(self.assists) + ", " \
-                "" + str(self.services_aces) + ", " + str(self.digs) + ", " + str(self.solo_blocks) + ", " + str(self.block_assists) + ", " + str(self.points) + ");"
+                "" + str(self.services_aces) + ", " + str(self.digs) + ", " + str(self.solo_blocks) + ", " + str(self.block_assists) + ", " + str(self.points) + ", " + str(self.number) + ");"
             
         sql_command = sql_command.replace("-", "0")
         print(sql_command)
