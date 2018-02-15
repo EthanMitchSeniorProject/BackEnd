@@ -150,7 +150,7 @@ class VolleyballPlayer(object):
                 self.kills + ", errors = " + self.errors + ", attempts = " + self.attempts + ", hitting_perc = " + 
                 self.hitting_perc + ", assists = " + self.assists + ", service_aces = " + self.services_aces + ", digs = " + 
                 self.digs + ", solo_blocks = " + self.solo_blocks + ", block_assists = " + self.block_assists + ", points = " + 
-                self.points + " WHERE name = '" + self.name + "';")
+                self.points + ", num = " + self.number + " WHERE name = '" + self.name + "';")
         else:
             sql_command = "INSERT INTO vball_player VALUES (" + str(self.getMaxId() + 1) + ", " + str(self.getTeamId()) + ", '" \
                 "" + str(self.name) + "', '" + str(self.year) + "', '"+ str(self.position) + "', " + str(self.matches_played) + ", " + str(self.sets_played) + ", " \
