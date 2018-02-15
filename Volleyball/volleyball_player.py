@@ -34,6 +34,7 @@ class VolleyballPlayer(object):
             self.number = td_list[0].contents[0]
         else:
             self.number = -1
+            
         #1 - Nothing
         #2 - Year
         if (td_list[2].contents[0] in year_translation):
