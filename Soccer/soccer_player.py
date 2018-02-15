@@ -112,6 +112,7 @@ class SoccerPlayer(object):
         print("Name:", self._name)
         print("Year:", self._year)
         print("Position:", self._position)
+        print("Number:", self._number)
         print("Games Played:", self._games_played)
         print("Games Started:", self._games_started)
         print("Points:", self._points)
@@ -154,14 +155,14 @@ class SoccerPlayer(object):
                 cursor = self._connection.cursor()
                 sql_command = "UPDATE player SET year = '"+self._year+"', position = '"+self._position+"', games_played = "+str(self._games_played) \
                     +", games_started = "+str(self._games_started)+", points = "+str(self._points)+", shots = "+str(self._shots)+", shots_on_goal = " \
-                    +str(self._shots_on_goal)+", yellow_cards = "+str(self._yellow_cards)+", red_cards = "+str(self._red_cards)+" WHERE name = '"+self._name+"';"
+                    +str(self._shots_on_goal)+", yellow_cards = "+str(self._yellow_cards)+", red_cards = "+str(self._red_cards)+", num = "+str(self._number)+" WHERE name = '"+self._name+"';"
                 cursor.execute(sql_command)
                 self._connection.commit()
             else:
                 cursor = self._connection.cursor()
                 new_id = self.getMaxId()
                 sql_command = "INSERT INTO player VALUES ("+str(new_id)+", '"+str(self.getTeamId())+"', '"+self._name+"', '"+self._year+"', '"+self._position+"', "+str(self._games_played) \
-                    +", "+str(self._games_started)+", "+str(self._points)+", "+str(self._shots)+", "+str(self._shots_on_goal)+", "+str(self._yellow_cards)+", "+str(self._red_cards)+");"
+                    +", "+str(self._games_started)+", "+str(self._points)+", "+str(self._shots)+", "+str(self._shots_on_goal)+", "+str(self._yellow_cards)+", "+str(self._red_cards)+", "+str(self._number)+");"
                 cursor.execute(sql_command)
                 self._connection.commit()
         except:

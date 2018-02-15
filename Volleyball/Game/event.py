@@ -136,7 +136,7 @@ class Event(object):
             sql_command2 = "INSERT INTO vball_player VALUES (" + str(self.getMaxId() + 1) + ", " + str(self.getPlayerTeamId()) + ", '" \
                 "" + str(name) + "', 'none', 'none', " + str(0) + ", " + str(0) + ", " \
                 "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " \
-                "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ");"
+                "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ");"
             print(sql_command2)
             cursor.execute(sql_command2)
             connection.commit()

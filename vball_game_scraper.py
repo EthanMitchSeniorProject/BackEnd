@@ -84,4 +84,4 @@ for play_stats in play_by_play_list:
                     previous_event = current_event
     
     # Send the current game and all its plays to the database
-    #current_game.sendToDatabase()
+    current_game.sendToDatabase()
