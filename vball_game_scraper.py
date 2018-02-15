@@ -57,6 +57,9 @@ for play_stats in play_by_play_list:
     game_info = soup.find("div", {"class" : "align-center"})
     current_game = Game(game_info)
 
+    if current_game.isInDatabase():
+        continue
+
     # Get "play-by-play" records
     stats_box = soup.find_all("div", {"class" : "stats-fullbox clearfix"})
     table = stats_box[1].find("table")

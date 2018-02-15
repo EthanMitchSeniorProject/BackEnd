@@ -146,7 +146,7 @@ class VolleyballPlayer(object):
     def sendToDatabase(self):
         cursor = self._connection.cursor()
         if self.doesRecordExist():
-            sql_command = ("UPDATE vball_player SET year = '" + self.year + "', position = '" + self.position + 
+            sql_command = ("UPDATE vball_player SET num = " + self.number + ", year = '" + self.year + "', position = '" + self.position + 
                 "', matches_played = " + self.matches_played + ", sets_played = " + self.sets_played + ", kills = " + 
                 self.kills + ", errors = " + self.errors + ", attempts = " + self.attempts + ", hitting_perc = " + 
                 self.hitting_perc + ", assists = " + self.assists + ", service_aces = " + self.services_aces + ", digs = " + 
