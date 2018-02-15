@@ -65,6 +65,8 @@ for play_stats in play_by_play_list:
     table = stats_box[1].find("table")
     data = table.find_all("tr")
 
+    previous_event = None
+
     # Loop through all the "play-by-play" records
     for element in data:
 
@@ -80,7 +82,9 @@ for play_stats in play_by_play_list:
             if ((temp_description.find("sub") == -1) and (temp_description.find("Timeout") == -1) and (temp_description.find("starters") == -1)):
                 
                 if (not temp_description.isspace() and (temp_description.find("Point") != -1)):
-                    current_game.addEvent(Event(current_game.getNewId(), current_game.getHomeTeam(), current_game.getAwayTeam(), element))
+                    current_event = Event(current_game.getNewId(), current_game.getHomeTeam(), current_game.getAwayTeam(), element, previous_event)
+                    current_game.addEvent(current_event)
+                    previous_event = current_event
     
     # Send the current game and all its plays to the database
     current_game.sendToDatabase()

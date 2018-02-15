@@ -12,13 +12,12 @@ connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=
 # Event class
 class Event(object):
 
-    def __init__(self, game_id, home_team, away_team, html_data):
+    def __init__(self, game_id, home_team, away_team, html_data, previous_play):
         
         print("-----Start Event Data-----")
 
         # TODO: Calculate rotation number based on the team that started serving and the points scored
         self.game_id = game_id
-        self.rotation = 1
 
         # Store the team name that is not Calvin
         #   Needed to get team id for players that we do not know
@@ -73,10 +72,29 @@ class Event(object):
 
         # Team ID (team that served the point)
         self.team_id = self.getTeamId(self.server_name)
+
+        # Rotation
+        if (previous_play is None):
+            self.rotation = 1
+        elif (self.new_score == "0-1" or self.new_score == "1-0"):
+            self.rotation = 1
+            print("FIRST POINT")
+        else:
+            if (self.team_id == 0):
+                if (self.getTeamId(previous_play.returnServerName()) == 0):
+                    self.rotation = previous_play.returnRotation()
+                else:
+                    if (previous_play.returnRotation() == 6):
+                        self.rotation = 1
+                    else:
+                        self.rotation = previous_play.returnRotation() + 1
+            else:
+                self.rotation = previous_play.returnRotation()
         
         # Output information
         print("New Score: ", self.new_score)
         print("Description: ", self.description)
+        print("Rotation: ", self.rotation)
         print("Server Name: ", self.server_name)
         print("Server ID: ", self.server_id)
         print("Team ID: ", self.team_id)
@@ -118,7 +136,7 @@ class Event(object):
             sql_command2 = "INSERT INTO vball_player VALUES (" + str(self.getMaxId() + 1) + ", " + str(self.getPlayerTeamId()) + ", '" \
                 "" + str(name) + "', 'none', 'none', " + str(0) + ", " + str(0) + ", " \
                 "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " \
-                "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ");"
+                "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ");"
             print(sql_command2)
             cursor.execute(sql_command2)
             connection.commit()
@@ -154,3 +172,9 @@ class Event(object):
         if (row is None):
             return -1
         return row[0]
+
+    def returnServerName(self):
+        return self.server_name
+
+    def returnRotation(self):
+        return self.rotation
