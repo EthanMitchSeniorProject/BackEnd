@@ -1,4 +1,6 @@
 import pyodbc
+from date_converter import DateConverter
+
 server = 'calvinscoutingreport.database.windows.net'
 database = 'ScoutingReport'
 username = 'athlete'
@@ -33,11 +35,11 @@ class Game(object):
         self.home_team = self.home_team.strip()
         self.away_team = self.away_team.strip()
 
-        date = html_data.find("span").contents[0]
+        self.date = DateConverter.convertStringToDate(html_data.find("span").contents[0])
 
         print("Home Team: ", self.home_team)
         print("Away Team: ", self.away_team)
-        print("Date: ", date)
+        print("Date: ", self.date)
 
         print("----End Game Data----\n\n")
 
@@ -55,7 +57,7 @@ class Game(object):
 
     def isInDatabase(self):
         cursor = connection.cursor()
-        sql_command = "SELECT COUNT(*) FROM game where home_team = '" + str(self.getTeamId(self.home_team)) + "' AND away_team = '" + str(self.getTeamId(self.away_team)) + "';"
+        sql_command = "SELECT COUNT(*) FROM game where home_team = '" + str(self.getTeamId(self.home_team)) + "' AND away_team = '" + str(self.getTeamId(self.away_team)) + "' AND game_date = '" + self.date + "';"
         print("is in database SQL command: " + sql_command)
         cursor.execute(sql_command)
         row = cursor.fetchone()
@@ -101,7 +103,7 @@ class Game(object):
 
         
     def sendToDatabase(self):
-        sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + str(self.getTeamId(self.home_team)) + "', '" + str(self.getTeamId(self.away_team)) + "');"
+        sql_command = "INSERT INTO game VALUES (" + str(self.getNewId()) + ", '" + str(self.getTeamId(self.home_team)) + "', '" + str(self.getTeamId(self.away_team)) + "', '" + self.date + "');"
         print("Game SQL command: " + sql_command)
         cursor = connection.cursor()
         cursor.execute(sql_command)
