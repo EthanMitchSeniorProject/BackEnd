@@ -1,12 +1,8 @@
 import pyodbc
 from date_converter import DateConverter
+from database_connection import DatabaseConnection
 
-server = 'calvinscoutingreport.database.windows.net'
-database = 'ScoutingReport'
-username = 'athlete'
-password = 'calvinscoutingreport123!'
-driver = '{ODBC Driver 13 for SQL Server}'
-connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+connection = DatabaseConnection.getConnection()
 
 class Game(object):
     def __init__(self, html_data):
