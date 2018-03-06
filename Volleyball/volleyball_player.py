@@ -1,15 +1,13 @@
 import pyodbc
+from database_connection import DatabaseConnection
 
 class VolleyballPlayer(object):
 
     def __init__(self, html_data, team_name):
+        
         # Information for connecting to the database server on Microsoft Azure
-        server = 'calvinscoutingreport.database.windows.net'
-        database = 'ScoutingReport'
-        username = 'athlete'
-        password = 'calvinscoutingreport123!'
-        driver = '{ODBC Driver 13 for SQL Server}'
-        self._connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+        self._connection = DatabaseConnection.getConnection()
+
         year_translation = {}
 
         year_translation["Fr."] = "Freshman"
