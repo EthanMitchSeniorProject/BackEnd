@@ -112,8 +112,8 @@ class Event(object):
     def sendToDatabase(self):
         # Add to database
         sql_command = "INSERT INTO vball_play VALUES (" + str(self.getNewId()) + ", " + str(self.game_id) + ", " + str(self.team_id) + ", "\
-            + str(self.server_id) + ", " + str(self.rotation) + ", '" + self.result + "', " + str(self.actor_id) + ", '" + str(self.new_score) + \
-            "');"
+            + str(self.server_id) + ", " + str(self.rotation) + ", '" + self.result + "', " + str(self.actor_id) + ", '" + str(self.new_score) + "', "\
+            + str(self.winning_point_team) + ");"
         print("Event insert SQL command: " + sql_command)
         cursor = self._connection.cursor()
         cursor.execute(sql_command)
