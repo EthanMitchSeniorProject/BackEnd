@@ -1,18 +1,14 @@
 # Necessary import for connecting to the database
 import pyodbc
-
-# Necessary connection information
-server = 'calvinscoutingreport.database.windows.net'
-database = 'ScoutingReport'
-username = 'athlete'
-password = 'calvinscoutingreport123!'
-driver = '{ODBC Driver 13 for SQL Server}'
-connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+from database_connection import DatabaseConnection
 
 # Event class
 class Event(object):
 
     def __init__(self, game_id, home_team, away_team, html_data, previous_play):
+        
+        # Information for connecting to the database server on Microsoft Azure
+        self._connection = DatabaseConnection.getConnection()
         
         print("-----Start Event Data-----")
 
@@ -119,14 +115,14 @@ class Event(object):
             + str(self.server_id) + ", " + str(self.rotation) + ", '" + self.result + "', " + str(self.actor_id) + ", '" + str(self.new_score) + \
             "');"
         print("Event insert SQL command: " + sql_command)
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute(sql_command)
-        connection.commit()
+        self._connection.commit()
 
     # Get new Id for a new play
     def getNewId(self):
         sql_command = "SELECT MAX(id) FROM vball_play;"
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute(sql_command)
         row = cursor.fetchone()
         if (row[0] is None):
@@ -136,7 +132,7 @@ class Event(object):
     # Find id for a given player based on their name
     def findPlayerId(self, name):
         sql_command = "SELECT id FROM vball_player WHERE name = '" + name + "';"
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute(sql_command)
         row = cursor.fetchone()
         if (row is None):
@@ -146,7 +142,7 @@ class Event(object):
                 "" + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + ");"
             print(sql_command2)
             cursor.execute(sql_command2)
-            connection.commit()
+            self._connection.commit()
         cursor.execute(sql_command)
         row2 = cursor.fetchone()
         return row2[0]
@@ -154,7 +150,7 @@ class Event(object):
     # Find team_id for a given player based on their name
     def getTeamId(self, player_name):
         sql_command = "SELECT team_id FROM vball_player WHERE name = '" + player_name + "';"
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute(sql_command)
         row = cursor.fetchone()
         if (row is None):
@@ -163,7 +159,7 @@ class Event(object):
     
     # Get the max id from the vball_player table
     def getMaxId(self):
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute("SELECT MAX(id) FROM vball_player")
         row = cursor.fetchone()
         if (row[0] is None):
@@ -173,7 +169,7 @@ class Event(object):
     # Get the team id from the vball_team table for the player being inserted into the player table
     def getPlayerTeamId(self):
         sql_command = "SELECT id FROM vball_team WHERE school_name = '" + self.not_calvin_team_name + "';"
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute(sql_command)
         row = cursor.fetchone()
         if (row is None):

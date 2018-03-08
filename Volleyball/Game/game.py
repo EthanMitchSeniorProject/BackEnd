@@ -1,18 +1,14 @@
 # Necessary import for connecting to the database
 import pyodbc
-
-# Necessary connection information for connecting to the database
-server = 'calvinscoutingreport.database.windows.net'
-database = 'ScoutingReport'
-username = 'athlete'
-password = 'calvinscoutingreport123!'
-driver = '{ODBC Driver 13 for SQL Server}'
-connection = pyodbc.connect('DRIVER='+driver+';PORT=1433;Server='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+from database_connection import DatabaseConnection
 
 # Game class
 class Game(object):
 
     def __init__(self, html_data):
+        
+        # Information for connecting to the database server on Microsoft Azure
+        self._connection = DatabaseConnection.getConnection()
 
         self._id = -1
 
@@ -22,6 +18,9 @@ class Game(object):
 
         # Get the tag that has the team names in it
         teams = html_data.find("strong").contents[0]
+
+        # Get the necessary information for the game date
+        self.date = self.convertDate(html_data.contents[6].split()[0])
 
         # Split the team names into two team names
         team_list = teams.split()
@@ -72,6 +71,7 @@ class Game(object):
         print("Home Team Id: ", self.home_team_id)
         print("Away Team: ", self.away_team)
         print("Away Team Id: ", self.away_team_id)
+        print("Date: ", self.date)
 
         print("----End Game Data----\n\n")
 
@@ -86,11 +86,11 @@ class Game(object):
             return
         
         # Add to Database
-        sql_command = "INSERT INTO vball_game VALUES (" + str(self.getNewId()) + ", " + str(self.home_team_id) + ", " + str(self.away_team_id) + ");"
+        sql_command = "INSERT INTO vball_game VALUES (" + str(self.getNewId()) + ", " + str(self.home_team_id) + ", " + str(self.away_team_id) + ", " + self.date + ");"
         print("Game SQL command: " + sql_command)
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute(sql_command)
-        connection.commit()
+        self._connection.commit()
 
         for e in self.events:
             e.sendToDatabase()
@@ -98,8 +98,8 @@ class Game(object):
     # Check if the game is already in the database...
     #   If so, do not insert into database again.
     def isInDatabase(self):
-        cursor = connection.cursor()
-        sql_command = "SELECT COUNT(*) FROM vball_game where home_team = '" + str(self.home_team_id) + "' AND away_team = '" + str(self.away_team_id) + "';"
+        cursor = self._connection.cursor()
+        sql_command = "SELECT COUNT(*) FROM vball_game where home_team = '" + str(self.home_team_id) + "' AND away_team = '" + str(self.away_team_id) + "' AND game_date = '" + self.date + "';"
         print("Is in database SQL command: " + sql_command)
         cursor.execute(sql_command)
         row = cursor.fetchone()
@@ -108,7 +108,7 @@ class Game(object):
 
     # Get the team id for the game class
     def getTeamId(self, team):
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute("SELECT id FROM vball_team where school_name = '" + team + "'")
         row = cursor.fetchone()
         if (row is None) or (row[0] is None):
@@ -124,7 +124,7 @@ class Game(object):
             insert_command = "INSERT INTO vball_team VALUES (" + str(new_id) + ", '" + team + "');"
             print(insert_command)
             cursor.execute(insert_command)
-            connection.commit()
+            self._connection.commit()
             return new_id
         else:
             return row[0]
@@ -134,7 +134,7 @@ class Game(object):
         if self._id != -1:
             return self._id
 
-        cursor = connection.cursor()
+        cursor = self._connection.cursor()
         cursor.execute("SELECT MAX(id) FROM vball_game;")
         row = cursor.fetchone()
         if (row[0] is None):
@@ -150,3 +150,32 @@ class Game(object):
     # Return the away team name
     def getAwayTeam(self):
         return self.away_team
+    
+    def convertDate(self, date):
+        date_list = date.split("/")
+
+        for x in range(0, 2):
+            if date_list[x] == "1":
+                date_list[x] = "01";
+            elif date_list[x] == "2":
+                date_list[x] = "02";
+            elif date_list[x] == "3":
+                date_list[x] = "03";
+            elif date_list[x] == "4":
+                date_list[x] = "04";
+            elif date_list[x] == "5":
+                date_list[x] = "05";
+            elif date_list[x] == "6":
+                date_list[x] = "06";
+            elif date_list[x] == "7":
+                date_list[x] = "07";
+            elif date_list[x] == "8":
+                date_list[x] = "08";
+            elif date_list[x] == "9":
+                date_list[x] = "09";
+
+        new_date = date_list[2] + "-" + date_list[0] + "-" + date_list[1]
+
+        return new_date
+
+        
