@@ -12,7 +12,6 @@ class Event(object):
         
         print("-----Start Event Data-----")
 
-        # TODO: Calculate rotation number based on the team that started serving and the points scored
         self.game_id = game_id
 
         # Store the team name that is not Calvin
@@ -86,6 +85,13 @@ class Event(object):
                         self.rotation = previous_play.returnRotation() + 1
             else:
                 self.rotation = previous_play.returnRotation()
+
+        # Which team scored the point
+        winning_team_temp = self.description.split(".")[1].strip()
+        if (winning_team_temp.find("CALVIN") == -1):
+            self.winning_point_team = self.getPlayerTeamId()
+        else:
+            self.winning_point_team = 0
         
         # Output information
         print("New Score: ", self.new_score)
@@ -98,6 +104,7 @@ class Event(object):
         print("Actor ID: ", self.actor_id)
         print("Game ID: ", self.game_id)
         print("Play Result: ", self.result)
+        print("Winning Point Team: ", self.winning_point_team)
 
         print("-----End Event Data-----\n\n")
 
@@ -105,8 +112,8 @@ class Event(object):
     def sendToDatabase(self):
         # Add to database
         sql_command = "INSERT INTO vball_play VALUES (" + str(self.getNewId()) + ", " + str(self.game_id) + ", " + str(self.team_id) + ", "\
-            + str(self.server_id) + ", " + str(self.rotation) + ", '" + self.result + "', " + str(self.actor_id) + ", '" + str(self.new_score) + \
-            "');"
+            + str(self.server_id) + ", " + str(self.rotation) + ", '" + self.result + "', " + str(self.actor_id) + ", '" + str(self.new_score) + "', "\
+            + str(self.winning_point_team) + ");"
         print("Event insert SQL command: " + sql_command)
         cursor = self._connection.cursor()
         cursor.execute(sql_command)
@@ -149,7 +156,7 @@ class Event(object):
         if (row is None):
             return -1
         return row[0]
-
+    
     # Get the max id from the vball_player table
     def getMaxId(self):
         cursor = self._connection.cursor()

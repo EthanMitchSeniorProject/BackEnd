@@ -86,7 +86,7 @@ class Game(object):
             return
         
         # Add to Database
-        sql_command = "INSERT INTO vball_game VALUES (" + str(self.getNewId()) + ", " + str(self.home_team_id) + ", " + str(self.away_team_id) + ", " + self.date + ");"
+        sql_command = "INSERT INTO vball_game VALUES (" + str(self.getNewId()) + ", " + str(self.home_team_id) + ", " + str(self.away_team_id) + ", '" + self.date + "');"
         print("Game SQL command: " + sql_command)
         cursor = self._connection.cursor()
         cursor.execute(sql_command)
