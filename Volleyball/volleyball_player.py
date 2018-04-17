@@ -144,12 +144,12 @@ class VolleyballPlayer(object):
     def sendToDatabase(self):
         cursor = self._connection.cursor()
         if self.doesRecordExist():
-            sql_command = ("UPDATE vball_player SET num = " + self.number + ", year = '" + self.year + "', position = '" + self.position + 
-                "', matches_played = " + self.matches_played + ", sets_played = " + self.sets_played + ", kills = " + 
-                self.kills + ", errors = " + self.errors + ", attempts = " + self.attempts + ", hitting_perc = " + 
-                self.hitting_perc + ", assists = " + self.assists + ", service_aces = " + self.services_aces + ", digs = " + 
-                self.digs + ", solo_blocks = " + self.solo_blocks + ", block_assists = " + self.block_assists + ", points = " + 
-                self.points + ", num = " + self.number + " WHERE name = '" + self.name + "';")
+            sql_command = ("UPDATE vball_player SET num = " + str(self.number) + ", year = '" + str(self.year) + "', position = '" + str(self.position) + 
+                "', matches_played = " + str(self.matches_played) + ", sets_played = " + str(self.sets_played) + ", kills = " + 
+                str(self.kills) + ", errors = " + str(self.errors) + ", attempts = " + str(self.attempts) + ", hitting_perc = " + 
+                str(self.hitting_perc) + ", assists = " + str(self.assists) + ", service_aces = " + str(self.services_aces) + ", digs = " + 
+                str(self.digs) + ", solo_blocks = " + str(self.solo_blocks) + ", block_assists = " + str(self.block_assists) + ", points = " + 
+                str(self.points) + " WHERE name = '" + str(self.name) + "';")
         else:
             sql_command = "INSERT INTO vball_player VALUES (" + str(self.getMaxId() + 1) + ", " + str(self.getTeamId()) + ", '" \
                 "" + str(self.name) + "', '" + str(self.year) + "', '"+ str(self.position) + "', " + str(self.matches_played) + ", " + str(self.sets_played) + ", " \
