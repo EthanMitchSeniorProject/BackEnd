@@ -1,49 +1,37 @@
 # Necessary imports for the Player classes and for the web_scraping library
 import urllib.request as urllib2
+import requests
+import json
 from bs4 import BeautifulSoup
 from Soccer.soccer_player import SoccerPlayer
 from Volleyball.volleyball_player import VolleyballPlayer
 
-# Men's Soccer team statistics sites
-calvin_page = {'team_name' : 'Calvin', 'site' : 'http://calvinknights.com/sports/msoc/2017-18/teams/calvin?view=profile&r=0&pos=kickers'}
-hope_page = {'team_name' : 'Hope', 'site' : 'http://athletics.hope.edu/sports/msoc/2017-18/teams/hope?view=profile&r=0&pos=kickers'}
-kalamazoo_page = {'team_name' : 'Kalamazoo', 'site' : 'http://hornets.kzoo.edu/sports/msoc/2017-18/teams/kalamazoo?view=profile&r=0&pos=kickers'}
-adrian_page = {'team_name' : 'Adrian', 'site' : 'http://www.adrianbulldogs.com/sports/m-soccer/2017-18/teams/adrian?view=profile&r=0&pos=kickers'}
-albion_page = {'team_name' : 'Albion', 'site' : 'http://www.gobrits.com/sports/msoc/2017-18/teams/albion?view=profile&r=0&pos=kickers'}
-alma_page = {'team_name' : 'Alma', 'site' : 'http://almascots.com/sports/msoc/2017-18/teams/alma?view=profile&r=0&pos=kickers'}
-olivet_page = {'team_name' : 'Olivet', 'site' : 'http://www.olivetcomets.com/sports/msoc/2017-18/teams/olivet?view=profile&r=0&pos=kickers'}
-trine_page = {'team_name' : 'Trine', 'site' : 'http://www.trinethunder.com/sports/msoc/2017-18/teams/trine?view=profile&r=0&pos=kickers'}
-
-# Women's Volleyball team statistics sites
-calvin_vball_page = {'team_name' : 'Calvin', 'site' : 'http://calvinknights.com/sports/wvball/2017-18/teams/calvin?view=profile&r=0&pos='}
-hope_vball_page = {'team_name' : 'Hope', 'site': 'http://athletics.hope.edu/sports/wvball/2017-18/teams/hope?view=profile&r=0&pos='}
-kalamazoo_vball_page = {'team_name' : 'Kalamazoo', 'site' : 'http://hornets.kzoo.edu/sports/wvball/2017-18/teams/kalamazoo?view=profile&r=0&pos='}
-adrian_vball_page = {'team_name' : 'Adrian', 'site' : 'http://www.adrianbulldogs.com/sports/w-volley/2017-18/teams/adrian?view=profile&r=0&pos='}
-albion_vball_page = {'team_name' : 'Albion', 'site' : 'http://www.gobrits.com/sports/wvball/2017-18/teams/albion?view=profile&r=0&pos='}
-alma_vball_page = {'team_name' : 'Alma', 'site' : 'http://almascots.com/sports/wvball/2017-18/teams/alma?view=profile&r=0&pos='}
-olivet_vball_page = {'team_name' : 'Olivet', 'site' : 'http://www.olivetcomets.com/sports/wvball/2017-18/teams/olivet?view=profile&r=0&pos='}
-trine_vball_page = {'team_name' : 'Trine', 'site' : 'http://www.trinethunder.com/sports/wvball/2017-18/teams/trine?view=profile&r=0&pos='}
-
 # Add the team sites to a list to be able to loop through
-website_list = (calvin_vball_page, hope_vball_page, kalamazoo_vball_page, adrian_vball_page, albion_vball_page,
-    alma_vball_page, olivet_vball_page, trine_vball_page, calvin_page, hope_page, kalamazoo_page, adrian_page,
-    albion_page, alma_page, olivet_page, trine_page)
+soccer_pages = json.loads(requests.get("http://localhost:3000/soccer/teams").text)
+vball_pages = json.loads(requests.get("http://localhost:3000/vball/teams").text)
+
+website_list = []
+
+for page in soccer_pages:
+    website_list.append(page)
+
+for page in vball_pages:
+    website_list.append(page)
 
 # Loop through each site
 for page in website_list:
-
-    html_page = urllib2.urlopen(page['site'])
+    html_page = urllib2.urlopen(page['url_route'])
     soup = BeautifulSoup(html_page, "html.parser")
 
     # Only search through the main statistics table, this query is more selective so we get fewer results
     # Check if it is a men's soccer link or a women's volleyball link
-    if "msoc" in page['site'] or "m-soccer" in page['site']:
+    if "msoc" in page['url_route'] or "m-soccer" in page['url_route']:
         tab_panel = soup.find("div", { "class" : "tab-panel clearfix active "})
         stats_box = tab_panel.find( "div", { "class" : "stats-box stats-box-alternate full clearfix"})
 
-    if "wvball" in page['site'] or "w-volley" in page['site']:
+    if "wvball" in page['url_route'] or "w-volley" in page['url_route']:
         # Check if it is Trine's site because they have the same exact html tag in two different locations
-        if "trine" in page['site']:
+        if "trine" in page['url_route']:
             all = soup.findAll("div", { "class" : "stats-box stats-box-alternate full clearfix"})
             stats_box = all[1]
         else:
@@ -60,9 +48,9 @@ for page in website_list:
         if "players" in str(href):
 
             # Again check if it is a men's soccer link or a women's volleyball link
-            if "msoc" in page['site'] or "m-soccer" in page['site']:
-                temp_player = SoccerPlayer(element, page['team_name'])
+            if "msoc" in page['url_route'] or "m-soccer" in page['url_route']:
+                temp_player = SoccerPlayer(element, page['school_name'])
                 temp_player.sendToDatabase()
-            if "wvball" in page['site'] or "w-volley" in page['site']:
-                temp_player = VolleyballPlayer(element, page['team_name'])
+            if "wvball" in page['url_route'] or "w-volley" in page['url_route']:
+                temp_player = VolleyballPlayer(element, page['school_name'])
                 temp_player.sendToDatabase()
