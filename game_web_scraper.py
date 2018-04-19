@@ -56,7 +56,9 @@ for page in soccer_pages:
     if end_index == -1:
         end_index = page["url_route"].find("edu/")
 
-    website_list.append(page["url_route"][:end_index + 3])
+    if end_index != -1:
+        website_list.append(page["url_route"][:end_index + 3])
+        print("Added: " + page["url_route"][:end_index + 3])
 teams_collecting = ['calvin', 'kalamazoo', 'hope']
 
 #list to keep track of games already collected
