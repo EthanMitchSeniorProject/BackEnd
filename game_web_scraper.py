@@ -1,6 +1,8 @@
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
 import re
+import requests
+import json
 from Soccer.Game.event import Event
 from Soccer.Game.game import Game
 from Soccer.Game.player_game import PlayerGame
@@ -43,10 +45,18 @@ def collectPlayerGameData(soup, table_class_string, team_name, game_id, starter_
 
 
 #schedule page
-calvin_base_page = 'http://calvinknights.com'
-kzoo_base_page = 'http://hornets.kzoo.edu'
-hope_base_page = 'http://athletics.hope.edu'
-website_list = [kzoo_base_page, calvin_base_page, hope_base_page]
+soccer_pages = json.loads(requests.get("http://localhost:3000/soccer/teams").text)
+website_list = []
+
+for page in soccer_pages:
+    if page["url_route"] is None:
+        continue
+    
+    end_index = page["url_route"].find("com/")
+    if end_index == -1:
+        end_index = page["url_route"].find("edu/")
+
+    website_list.append(page["url_route"][:end_index + 3])
 teams_collecting = ['calvin', 'kalamazoo', 'hope']
 
 #list to keep track of games already collected
@@ -54,7 +64,11 @@ teams_collecting = ['calvin', 'kalamazoo', 'hope']
 games_collected = []
 
 for site in website_list:
-    schedule_page = site + '/sports/msoc/2017-18/schedule'
+    if not "adrianbulldogs" in site:
+        schedule_page = site + '/sports/msoc/2017-18/schedule'
+    else:
+        schedule_page = site + '/sports/m-soccer/2017-18/schedule'
+    print("Making request for: " + schedule_page)
     html_schedule_page = urllib2.urlopen(schedule_page)
     schedule_soup = BeautifulSoup(html_schedule_page, "html.parser")
     game_links = schedule_soup.find_all("a", href=re.compile("boxscores"))

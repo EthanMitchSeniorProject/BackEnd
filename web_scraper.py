@@ -20,6 +20,8 @@ for page in vball_pages:
 
 # Loop through each site
 for page in website_list:
+    if page["url_route"] == "":
+        continue
     html_page = urllib2.urlopen(page['url_route'])
     soup = BeautifulSoup(html_page, "html.parser")
 
