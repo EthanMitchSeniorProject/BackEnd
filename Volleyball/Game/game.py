@@ -121,7 +121,7 @@ class Game(object):
                 new_id = row[0] + 1
 
             #Team does not currently exist, need to create it on DB
-            insert_command = "INSERT INTO vball_team VALUES (" + str(new_id) + ", '" + team + "');"
+            insert_command = "INSERT INTO vball_team(id, school_name) VALUES (" + str(new_id) + ", '" + team + "');"
             print(insert_command)
             cursor.execute(insert_command)
             self._connection.commit()
