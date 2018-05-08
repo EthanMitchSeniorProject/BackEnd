@@ -20,7 +20,8 @@ for page in vball_pages:
 
 # Loop through each site
 for page in website_list:
-    if page["url_route"] == "":
+    print(page)
+    if page["url_route"] == "" or page["url_route"] == None:
         continue
     html_page = urllib2.urlopen(page['url_route'])
     soup = BeautifulSoup(html_page, "html.parser")
@@ -52,7 +53,8 @@ for page in website_list:
             # Again check if it is a men's soccer link or a women's volleyball link
             if "msoc" in page['url_route'] or "m-soccer" in page['url_route']:
                 temp_player = SoccerPlayer(element, page['school_name'])
-                temp_player.sendToDatabase()
+                # temp_player.sendToDatabase()
+                continue
             if "wvball" in page['url_route'] or "w-volley" in page['url_route']:
                 temp_player = VolleyballPlayer(element, page['school_name'])
                 temp_player.sendToDatabase()
