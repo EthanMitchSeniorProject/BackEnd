@@ -7,7 +7,7 @@ import json
 from Volleyball.Game.game import Game
 from Volleyball.Game.event import Event
 
-teams_collecting = ['kzoo']
+teams_collecting = ['calvin', 'hope', 'kzoo']
 vball_pages = json.loads(requests.get("http://localhost:3000/vball/teams").text)
 site_list = []
 
