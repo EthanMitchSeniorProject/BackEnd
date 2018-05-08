@@ -32,7 +32,7 @@ for page in vball_pages:
         site_list.append(page["url_route"][:end_index + 3])
         print("Added: " + page["url_route"][:end_index + 3])
 
-i = 2
+i = 0
 
 # Starting url address for the web scraper
 for base_page in site_list:
