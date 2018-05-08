@@ -53,8 +53,7 @@ for page in website_list:
             # Again check if it is a men's soccer link or a women's volleyball link
             if "msoc" in page['url_route'] or "m-soccer" in page['url_route']:
                 temp_player = SoccerPlayer(element, page['school_name'])
-                # temp_player.sendToDatabase()
-                continue
+                temp_player.sendToDatabase()
             if "wvball" in page['url_route'] or "w-volley" in page['url_route']:
                 temp_player = VolleyballPlayer(element, page['school_name'])
                 temp_player.sendToDatabase()
