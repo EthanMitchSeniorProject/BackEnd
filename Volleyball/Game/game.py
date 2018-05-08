@@ -5,7 +5,7 @@ from database_connection import DatabaseConnection
 # Game class
 class Game(object):
 
-    def __init__(self, html_data):
+    def __init__(self, html_data, current_team_collecting):
         
         # Information for connecting to the database server on Microsoft Azure
         self._connection = DatabaseConnection.getConnection()
@@ -15,6 +15,9 @@ class Game(object):
         print("----Start Game Data----")
 
         self.events = []
+        
+        self.current_team_collecting = current_team_collecting
+        self.current_team_collecting_id = self.getTeamId(self.current_team_collecting)
 
         # Get the tag that has the team names in it
         teams = html_data.find("strong").contents[0]
@@ -72,6 +75,8 @@ class Game(object):
         print("Away Team: ", self.away_team)
         print("Away Team Id: ", self.away_team_id)
         print("Date: ", self.date)
+        print("Team Collecting: ", self.current_team_collecting)
+        print("Team ID Collecting: ", self.current_team_collecting_id)
 
         print("----End Game Data----\n\n")
 
@@ -86,7 +91,7 @@ class Game(object):
             return
         
         # Add to Database
-        sql_command = "INSERT INTO vball_game VALUES (" + str(self.getNewId()) + ", " + str(self.home_team_id) + ", " + str(self.away_team_id) + ", '" + self.date + "');"
+        sql_command = "INSERT INTO vball_game VALUES (" + str(self.getNewId()) + ", " + str(self.home_team_id) + ", " + str(self.away_team_id) + ", '" + self.date + "', " + str(self.current_team_collecting_id) + ");"
         print("Game SQL command: " + sql_command)
         cursor = self._connection.cursor()
         cursor.execute(sql_command)
@@ -99,7 +104,7 @@ class Game(object):
     #   If so, do not insert into database again.
     def isInDatabase(self):
         cursor = self._connection.cursor()
-        sql_command = "SELECT COUNT(*) FROM vball_game where home_team = '" + str(self.home_team_id) + "' AND away_team = '" + str(self.away_team_id) + "' AND game_date = '" + self.date + "';"
+        sql_command = "SELECT COUNT(*) FROM vball_game where home_team = '" + str(self.home_team_id) + "' AND away_team = '" + str(self.away_team_id) + "' AND game_date = '" + self.date + "' AND team_collecting = " + str(self.current_team_collecting_id) + ";"
         print("Is in database SQL command: " + sql_command)
         cursor.execute(sql_command)
         row = cursor.fetchone()

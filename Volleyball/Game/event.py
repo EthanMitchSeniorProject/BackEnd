@@ -5,7 +5,7 @@ from database_connection import DatabaseConnection
 # Event class
 class Event(object):
 
-    def __init__(self, game_id, home_team, away_team, html_data, previous_play):
+    def __init__(self, game_id, home_team, away_team, html_data, previous_play, current_team_collecting):
         
         # Information for connecting to the database server on Microsoft Azure
         self._connection = DatabaseConnection.getConnection()
@@ -14,12 +14,15 @@ class Event(object):
 
         self.game_id = game_id
 
+        self.current_team_collecting = current_team_collecting
+        self.current_team_collecting_id = self.getTeamIdTeamName(self.current_team_collecting)
+
         # Store the team name that is not Calvin
         #   Needed to get team id for players that we do not know
-        if (home_team.find("Calvin") == -1):
-            self.not_calvin_team_name = home_team
+        if (home_team.find(self.current_team_collecting) == -1):
+            self.not_collecting_team_name = home_team
         else:
-            self.not_calvin_team_name = away_team
+            self.not_collecting_team_name = away_team
 
         td_list = html_data.findAll("td")
 
@@ -75,8 +78,8 @@ class Event(object):
             self.rotation = 1
             print("FIRST POINT")
         else:
-            if (self.team_id == 0):
-                if (self.getTeamId(previous_play.returnServerName()) == 0):
+            if (self.team_id == self.current_team_collecting_id):
+                if (self.getTeamId(previous_play.returnServerName()) == self.current_team_collecting_id):
                     self.rotation = previous_play.returnRotation()
                 else:
                     if (previous_play.returnRotation() == 6):
@@ -87,11 +90,15 @@ class Event(object):
                 self.rotation = previous_play.returnRotation()
 
         # Which team scored the point
+        if (self.current_team_collecting == "Kalamazoo"):
+            collecting_temp_temp = "KZOO"
+        else:
+            collecting_team_temp = self.current_team_collecting.upper()
         winning_team_temp = self.description.split(".")[1].strip()
-        if (winning_team_temp.find("CALVIN") == -1):
+        if (winning_team_temp.find(collecting_team_temp) == -1):
             self.winning_point_team = self.getPlayerTeamId()
         else:
-            self.winning_point_team = 0
+            self.winning_point_team = self.current_team_collecting_id
         
         # Output information
         print("New Score: ", self.new_score)
@@ -168,7 +175,7 @@ class Event(object):
 
     # Get the team id from the vball_team table for the player being inserted into the player table
     def getPlayerTeamId(self):
-        sql_command = "SELECT id FROM vball_team WHERE school_name = '" + self.not_calvin_team_name + "';"
+        sql_command = "SELECT id FROM vball_team WHERE school_name = '" + self.not_collecting_team_name + "';"
         cursor = self._connection.cursor()
         cursor.execute(sql_command)
         row = cursor.fetchone()
@@ -181,3 +188,24 @@ class Event(object):
 
     def returnRotation(self):
         return self.rotation
+
+    def setRotation(self, new_rotation):
+        self.rotation = new_rotation
+
+    def getPlayerPosition(self, id):
+        sql_command = "SELECT position from vball_player WHERE id = " + id
+        cursor = self._connection.cursor()
+        cursor.execute(sql_command)
+        row = cursor.fetchone()
+        if (row is None):
+            return -1
+        return row[0]
+
+    def getTeamIdTeamName(self, team_name):
+        sql_command = "SELECT id FROM vball_team WHERE school_name = '" + team_name + "';"
+        cursor = self._connection.cursor()
+        cursor.execute(sql_command)
+        row = cursor.fetchone()
+        if (row is None):
+            return -1
+        return row[0]

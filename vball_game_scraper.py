@@ -7,7 +7,7 @@ import json
 from Volleyball.Game.game import Game
 from Volleyball.Game.event import Event
 
-teams_collecting = ['calvin', 'hope']
+teams_collecting = ['calvin', 'hope', 'kzoo']
 vball_pages = json.loads(requests.get("http://localhost:3000/vball/teams").text)
 site_list = []
 
@@ -32,11 +32,15 @@ for page in vball_pages:
         site_list.append(page["url_route"][:end_index + 3])
         print("Added: " + page["url_route"][:end_index + 3])
 
-    
+i = 2
 
 # Starting url address for the web scraper
 for base_page in site_list:
-
+    
+    current_team_collecting = vball_pages[i]["school_name"]
+    print("######################################")
+    print("COLLECTING GAME DATA FOR " + current_team_collecting)
+    print("######################################")
 
     # Connect to the schedule page and find all the box score links
     schedule_page = base_page + '/sports/wvball/2017-18/schedule'
@@ -85,7 +89,7 @@ for base_page in site_list:
 
         # Get Game information
         game_info = soup.find("div", {"class" : "align-center"})
-        current_game = Game(game_info)
+        current_game = Game(game_info, current_team_collecting)
 
         if current_game.isInDatabase():
             continue
@@ -108,13 +112,15 @@ for base_page in site_list:
                 temp_description = td_list[1].contents[0]
 
                 # Only create plays for plays that we want to store...
-                # TODO: Rework these two if statements to only be one that checks for "Point"
-                if ((temp_description.find("sub") == -1) and (temp_description.find("Timeout") == -1) and (temp_description.find("starters") == -1)):
+                # Do not enter substitution plays, timeout plays, the list of starters, or out of rotation plays
+                if ((temp_description.find("sub") == -1) and (temp_description.find("Timeout") == -1) and (temp_description.find("starters") == -1) and (temp_description.find("official") == -1) and (temp_description.find("block error") == -1)):
                     
                     if (not temp_description.isspace() and (temp_description.find("Point") != -1)):
-                        current_event = Event(current_game.getNewId(), current_game.getHomeTeam(), current_game.getAwayTeam(), element, previous_event)
+                        current_event = Event(current_game.getNewId(), current_game.getHomeTeam(), current_game.getAwayTeam(), element, previous_event, current_team_collecting)
                         current_game.addEvent(current_event)
                         previous_event = current_event
         
         # Send the current game and all its plays to the database
         current_game.sendToDatabase()
+    
+    i = i + 1
