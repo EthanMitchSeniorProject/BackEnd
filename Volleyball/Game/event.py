@@ -91,14 +91,16 @@ class Event(object):
 
         # Which team scored the point
         if (self.current_team_collecting == "Kalamazoo"):
-            collecting_temp_temp = "KZOO"
+            collecting_team_temp = "KZOO"
+            #For Kalamzoo game with id 72
+            collecting_team_temp_additional = "KALAMAZO"
         else:
             collecting_team_temp = self.current_team_collecting.upper()
         winning_team_temp = self.description.split(".")[1].strip()
-        if (winning_team_temp.find(collecting_team_temp) == -1):
-            self.winning_point_team = self.getPlayerTeamId()
-        else:
+        if (winning_team_temp.find(collecting_team_temp) != -1):
             self.winning_point_team = self.current_team_collecting_id
+        else:
+            self.winning_point_team = self.getPlayerTeamId()
         
         # Output information
         print("New Score: ", self.new_score)
