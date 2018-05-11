@@ -1,6 +1,6 @@
 import pyodbc
-from date_converter import DateConverter
-from database_connection import DatabaseConnection
+from Utilities.date_converter import DateConverter
+from Utilities.database_connection import DatabaseConnection
 
 connection = DatabaseConnection.getConnection()
 

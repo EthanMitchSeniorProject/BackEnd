@@ -1,5 +1,5 @@
 import pyodbc
-from database_connection import DatabaseConnection
+from Utilities.database_connection import DatabaseConnection
 
 class VolleyballPlayer(object):
 

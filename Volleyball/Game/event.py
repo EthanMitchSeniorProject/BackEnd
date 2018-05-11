@@ -1,6 +1,6 @@
 # Necessary import for connecting to the database
 import pyodbc
-from database_connection import DatabaseConnection
+from Utilities.database_connection import DatabaseConnection
 
 # Event class
 class Event(object):
